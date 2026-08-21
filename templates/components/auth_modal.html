@@ -1,0 +1,190 @@
+{% if not user.is_authenticated %}
+<div class="login-modal" data-login-modal aria-hidden="true">
+  <div class="login-modal-overlay" data-login-close></div>
+  <div class="login-modal-panel" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <button type="button" class="login-modal-close" data-login-close aria-label="Kapat">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="login-modal-grid">
+      <div class="login-brand-panel">
+        <div class="brand-panel-top">
+          <span class="brand-panel-site">{{ request.get_host|lower }}</span>
+        </div>
+        <div class="brand-panel-center">
+          <div class="brand-logo-circle"><i class="fa-solid fa-leaf"></i></div>
+          <h2>Tekrar Hoşgeldiniz</h2>
+          <span class="brand-panel-sub">Yapay Çiçek Deposu Kalitesiyle</span>
+          <p class="brand-panel-desc">
+            Sipariş geçmişinizi görüntülemek, favori ürünlerinize hızlıca
+            ulaşmak ve size özel fiyatları görmek için hesabınıza giriş
+            yapın.
+          </p>
+        </div>
+        <div class="brand-panel-bottom">
+          <i class="fa-solid fa-lock"></i> Güvenli Bağlantı
+        </div>
+      </div>
+
+      <div class="login-form-panel">
+        <div class="auth-tabs" role="tablist" aria-label="Hesap İşlemleri">
+          <button type="button" class="auth-tab active" data-auth-tab="login" role="tab"
+            aria-selected="true" aria-controls="authPanelLogin" id="authTabLogin">
+            Giriş Yap
+          </button>
+          <button type="button" class="auth-tab" data-auth-tab="register" role="tab"
+            aria-selected="false" aria-controls="authPanelRegister" id="authTabRegister">
+            Kayıt Ol
+          </button>
+        </div>
+
+        <!-- Giriş formu: auth-modal.js bunu fetch ile accounts:login'e POST
+             eder ve JSON cevap bekler (bkz. apps/accounts/views.py). Başarılıysa
+             modal'dan hiç çıkmadan sayfa aynı yerde yenilenir (next=request.path);
+             hatalıysa hata mesajları modal içinde, sayfa hiç değişmeden gösterilir. -->
+        <div class="auth-panel active" data-auth-panel="login" id="authPanelLogin"
+          role="tabpanel" aria-labelledby="authTabLogin">
+          <h1 id="authModalTitle">Hoş Geldiniz</h1>
+          <p>Alışverişe devam etmek için hesabınıza giriş yapın.</p>
+
+          <form method="post" action="{% url 'accounts:login' %}" data-auth-form>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+
+            <p class="error-message" data-form-error></p>
+
+            <div class="form-group">
+              <label for="modalLoginUsername">E-posta Adresi</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-envelope field-icon"></i>
+                <input type="email" id="modalLoginUsername" name="username" placeholder="ornek@sirket.com"
+                  autocomplete="email" required autofocus>
+              </div>
+              <span class="error-message" data-field-error="username"></span>
+            </div>
+
+            <div class="form-group">
+              <div class="field-label-row">
+                <label for="modalLoginPassword">Şifre</label>
+                <a href="#" class="inline-link">Şifremi unuttum?</a>
+              </div>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-lock field-icon"></i>
+                <input type="password" id="modalLoginPassword" name="password" placeholder="Şifrenizi girin"
+                  autocomplete="current-password" required>
+                <button type="button" class="password-toggle-btn" data-password-toggle
+                  data-target="modalLoginPassword" aria-label="Şifreyi göster" aria-pressed="false">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <span class="error-message" data-field-error="password"></span>
+            </div>
+
+            <label class="remember-row">
+              <input type="checkbox" name="remember_me">
+              Beni hatırla
+            </label>
+
+            <button type="submit" class="login-btn">
+              <span class="btn-label">Giriş Yap</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="auth-divider">Veya şununla devam et</div>
+
+          <button type="button" class="google-btn" disabled title="Google ile giriş yakında">
+            <i class="fa-brands fa-google"></i> Google ile Giriş Yap
+          </button>
+
+          <div class="register-link">
+            Henüz bir hesabınız yok mu?
+            <a href="#" data-switch-to-register>Hemen Kaydolun</a>
+          </div>
+        </div>
+
+        <!-- Kayıt formu: auth-modal.js bunu fetch ile accounts:register'a POST
+             eder ve JSON cevap bekler. Alan adları apps/accounts/forms.py ->
+             RegisterForm ile birebir eşleşiyor: full_name, email, password1,
+             password2, terms. Kullanıcı adı e-postadan otomatik üretilir. -->
+        <div class="auth-panel" data-auth-panel="register" id="authPanelRegister"
+          role="tabpanel" aria-labelledby="authTabRegister" hidden>
+          <h1>Hemen Kaydolun</h1>
+          <p>Yeni hesap oluşturarak alışverişe başlayın.</p>
+
+          <form method="post" action="{% url 'accounts:register' %}" data-auth-form>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+
+            <p class="error-message" data-form-error></p>
+
+            <div class="form-group">
+              <label for="regFullName">Ad Soyad</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user field-icon"></i>
+                <input type="text" id="regFullName" name="full_name" placeholder="Adınız Soyadınız"
+                  autocomplete="name" required>
+              </div>
+              <span class="error-message" data-field-error="full_name"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="regEmail">E-posta Adresi</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-envelope field-icon"></i>
+                <input type="email" id="regEmail" name="email" placeholder="ornek@sirket.com"
+                  autocomplete="email" required>
+              </div>
+              <span class="error-message" data-field-error="email"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="regPassword1">Şifre</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-lock field-icon"></i>
+                <input type="password" id="regPassword1" name="password1" placeholder="En az 8 karakter"
+                  autocomplete="new-password" required minlength="8">
+                <button type="button" class="password-toggle-btn" data-password-toggle
+                  data-target="regPassword1" aria-label="Şifreyi göster" aria-pressed="false">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <span class="error-message" data-field-error="password1"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="regPassword2">Şifre Tekrar</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-lock field-icon"></i>
+                <input type="password" id="regPassword2" name="password2" placeholder="Şifrenizi tekrar girin"
+                  autocomplete="new-password" required minlength="8">
+                <button type="button" class="password-toggle-btn" data-password-toggle
+                  data-target="regPassword2" aria-label="Şifreyi göster" aria-pressed="false">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <span class="error-message" data-field-error="password2"></span>
+            </div>
+
+            <label class="remember-row">
+              <input type="checkbox" name="terms" required>
+              <span><a href="#" class="inline-link">Kullanım Şartları</a>'nı okudum ve kabul ediyorum.</span>
+            </label>
+            <span class="error-message" data-field-error="terms"></span>
+
+            <button type="submit" class="login-btn">
+              <span class="btn-label">Kayıt Ol</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="register-link">
+            Zaten bir hesabınız var mı?
+            <a href="#" data-switch-to-login>Giriş Yapın</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

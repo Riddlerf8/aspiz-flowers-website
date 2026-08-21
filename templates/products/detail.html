@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.name }} - Çiçek Deposu{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Small bits the Tailwind build can't express as static utility classes
+     (JS toggles these two class names directly). */
+  .thumb-active { border-color: #7d2140; box-shadow: 0 0 0 1px #7d2140; }
+  .tier-box.tier-active {
+    border-color: #16a34a;
+    background-color: #f0fdf4;
+  }
+  .tier-box.tier-active .tier-price { color: #16a34a; }
+  .accordion-panel { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+  .accordion-icon { transition: transform .2s ease; }
+</style>
+{% endblock %}
+
+{% block content %}
+  <nav class="text-xs text-wine-400 dark:text-[#a39c8f] mb-4">
+    <a href="{% url 'core:home' %}" class="hover:text-wine-700 dark:hover:text-[#e8dfc8]">Ana Sayfa</a> /
+    <a href="{% url 'products:list' %}" class="hover:text-wine-700 dark:hover:text-[#e8dfc8]">Tüm Ürünler</a> /
+    <a href="{% url 'products:by_category' product.category.slug %}" class="hover:text-wine-700 dark:hover:text-[#e8dfc8]">{{ product.category.name|upper }}</a> /
+    <span class="text-wine-700 dark:text-[#e8dfc8]">{{ product.name }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Gallery -->
+    <div>
+      <div class="relative aspect-square bg-cream-100 dark:bg-[#242424] rounded-2xl overflow-hidden mb-3">
+        {% if product.primary_image %}
+          <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
+               class="w-full h-full object-cover" data-gallery-main>
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center text-wine-200 dark:text-white/20" data-gallery-main>Görsel yok</div>
+        {% endif %}
+
+        {% if product.images.count > 1 %}
+          <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-pill"
+                data-gallery-counter>1/{{ product.images.count }}</span>
+        {% endif %}
+      </div>
+
+      {% if product.images.count > 1 %}
+        <div class="flex gap-2 overflow-x-auto">
+          {% for img in product.images.all %}
+            <button type="button" data-gallery-thumb data-full-src="{{ img.image.url }}"
+                    class="shrink-0 w-16 h-16 rounded-lg border-2 {% if forloop.first %}thumb-active{% else %}border-cream-200 dark:border-white/10{% endif %} overflow-hidden">
+              <img src="{{ img.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div>
+      {% if product.display_badge %}
+        <span class="inline-block text-white text-xs font-semibold px-3 py-1 rounded-pill bg-gradient-to-r {{ product.badge_gradient_classes }} mb-2">
+          {{ product.display_badge|upper }}
+        </span>
+      {% endif %}
+
+      <h1 class="font-serif text-2xl text-wine-900 dark:text-[#f5f3ef] mb-1">{{ product.name }}</h1>
+      <p class="text-xs text-wine-400 dark:text-[#a39c8f] mb-4">SKU: {{ product.sku }}</p>
+
+      {% if product.price_tiers.all %}
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          {% for tier in product.price_tiers.all %}
+            <button type="button" data-tier-select data-tier-min-qty="{{ tier.min_quantity }}"
+                    class="tier-box {% if forloop.last %}tier-active{% endif %} text-left border border-cream-200 dark:border-white/10 rounded-xl px-3 py-2.5 transition">
+              <span class="block tier-price text-base font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ tier.price }}$</span>
+              <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">
+                {% if forloop.last %}≥{{ tier.min_quantity }} ad
+                {% elif forloop.first %}Min. {{ tier.min_quantity }} ad
+                {% else %}{{ tier.min_quantity }}+ ad{% endif %}
+              </span>
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <ul class="space-y-2 mb-5 text-xs text-wine-500 dark:text-[#a39c8f]">
+        <li class="flex items-center gap-2">
+          <i class="fa-regular fa-clock text-wine-300 dark:text-[#8a7355]"></i>
+          Hafta içi 15:00'e kadar onaylanan siparişler aynı gün kargoda
+        </li>
+        <li class="flex items-center gap-2">
+          <i class="fa-solid fa-truck-fast text-wine-300 dark:text-[#8a7355]"></i>
+          81 ile kargo/ambar sevkiyatı · dilerseniz kendi anlaşmanızla
+        </li>
+        <li class="flex items-center gap-2">
+          <i class="fa-solid fa-rotate text-wine-300 dark:text-[#8a7355]"></i>
+          Ayıplı üründe koşulsuz değişim · her sevkiyat faturalı
+        </li>
+      </ul>
+
+      <form action="{% url 'cart:add' product.id %}" method="post" class="flex items-center gap-3 mb-3">
+        {% csrf_token %}
+        <input type="number" name="quantity" data-qty-input
+               value="{{ product.price_tiers.last.min_quantity|default:1 }}" min="1"
+               max="{{ product.stock_quantity }}" {% if product.is_sold_out %}disabled{% endif %}
+               class="w-24 rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm">
+        <button type="submit" {% if product.is_sold_out %}disabled{% endif %}
+                class="flex-1 rounded-pill py-3 font-medium text-white transition flex items-center justify-center gap-2
+                       {% if product.is_sold_out %}bg-wine-100 dark:bg-white/10 text-wine-300 dark:text-[#8a7355] cursor-not-allowed{% else %}bg-orange-500 hover:bg-orange-600{% endif %}">
+          <i class="fa-solid fa-cart-shopping"></i>
+          {% if product.is_sold_out %}Tükendi{% else %}Sepete Ekle{% endif %}
+        </button>
+      </form>
+
+      <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}?text={{ product.name|urlencode }}{{ ' hakkında bilgi almak istiyorum.'|urlencode }}"
+         target="_blank" rel="noopener noreferrer"
+         class="inline-flex items-center gap-2 text-sm text-wine-600 dark:text-[#d8cdbd] hover:text-wine-800 mb-2">
+        <i class="fa-brands fa-whatsapp text-emerald-600"></i> WhatsApp'tan Sohbet Et
+      </a>
+
+      <p class="text-xs text-wine-400 dark:text-[#a39c8f]">{{ product.stock_quantity }} adet stokta</p>
+    </div>
+  </div>
+
+  <!-- Accordion: description / shipping / payment -->
+  <div class="mt-8 max-w-3xl border-t border-cream-200 dark:border-white/10">
+    {% if product.description %}
+      <div class="border-b border-cream-200 dark:border-white/10">
+        <button type="button" data-accordion-trigger aria-expanded="false"
+                class="w-full flex items-center justify-between py-4 text-sm font-medium text-wine-800 dark:text-[#f5f3ef]">
+          <span class="flex items-center gap-2"><i class="fa-regular fa-file-lines text-wine-300 dark:text-[#8a7355]"></i> Ürün Açıklaması</span>
+          <i class="fa-solid fa-chevron-down accordion-icon transition-transform duration-200 text-wine-300 dark:text-[#8a7355] text-xs"></i>
+        </button>
+        <div class="accordion-panel">
+          <p class="text-sm text-wine-600 dark:text-[#d8cdbd] leading-relaxed pb-4">{{ product.description }}</p>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="border-b border-cream-200 dark:border-white/10">
+      <button type="button" data-accordion-trigger aria-expanded="false"
+              class="w-full flex items-center justify-between py-4 text-sm font-medium text-wine-800 dark:text-[#f5f3ef]">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-truck text-wine-300 dark:text-[#8a7355]"></i> Kargo ve Teslimat</span>
+        <i class="fa-solid fa-chevron-down accordion-icon transition-transform duration-200 text-wine-300 dark:text-[#8a7355] text-xs"></i>
+      </button>
+      <div class="accordion-panel">
+        <p class="text-sm text-wine-600 dark:text-[#d8cdbd] leading-relaxed pb-4">
+          Hafta içi 15:00'e kadar onaylanan siparişler aynı gün kargoya verilir.
+        </p>
+      </div>
+    </div>
+
+    <div class="border-b border-cream-200 dark:border-white/10">
+      <button type="button" data-accordion-trigger aria-expanded="false"
+              class="w-full flex items-center justify-between py-4 text-sm font-medium text-wine-800 dark:text-[#f5f3ef]">
+        <span class="flex items-center gap-2"><i class="fa-regular fa-credit-card text-wine-300 dark:text-[#8a7355]"></i> Ödeme</span>
+        <i class="fa-solid fa-chevron-down accordion-icon transition-transform duration-200 text-xs text-wine-300 dark:text-[#8a7355]"></i>
+      </button>
+      <div class="accordion-panel">
+        <p class="text-sm text-wine-600 dark:text-[#d8cdbd] leading-relaxed pb-4">
+          Havale/EFT ile güvenli ödeme, 256-bit SSL şifreleme.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="mt-8 max-w-3xl">
+    <h2 class="font-serif text-lg text-wine-900 dark:text-[#f5f3ef] mb-3">Değerlendirmeler</h2>
+    <div class="border border-cream-200 dark:border-white/10 rounded-xl p-6 text-center text-sm text-wine-400 dark:text-[#a39c8f]">
+      Bu ürün için henüz değerlendirme yapılmadı.
+    </div>
+  </div>
+
+  {% if related %}
+    <div class="mt-10">
+      {% include "components/product_section.html" with title="Benzer Ürünler" products=related bg="bg-white" %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/js/product-detail.js' %}" defer></script>
+{% endblock %}

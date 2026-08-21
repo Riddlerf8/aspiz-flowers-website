@@ -1,0 +1,76 @@
+from django.contrib import admin
+
+from .models import Category, PriceTier, Product, ProductImage
+
+# Badge.choices carries the Turkish labels shown to shoppers on the site
+# (Yeni Sezon, Popüler, ...). The admin panel is English-only per store
+# policy, so this is a second, admin-only label set for the SAME values —
+# it never touches what's stored or what customers see.
+BADGE_LABELS_EN = {
+    Product.Badge.NONE: "No badge",
+    Product.Badge.EDITOR_CHOICE: "Editor's Choice",
+    Product.Badge.NEW_SEASON: "New Season",
+    Product.Badge.DEAL: "Deal",
+    Product.Badge.POPULAR: "Popular",
+    Product.Badge.SPECIAL_SERIES: "Special Series",
+    Product.Badge.LOW_STOCK: "Low Stock",
+}
+
+
+class BadgeAdminFilter(admin.SimpleListFilter):
+    title = "badge"
+    parameter_name = "badge"
+
+    def lookups(self, request, model_admin):
+        return list(BADGE_LABELS_EN.items())
+
+    def queryset(self, request, queryset):
+        return queryset.filter(badge=self.value()) if self.value() else queryset
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+    fields = ("image", "is_primary", "order")
+
+
+class PriceTierInline(admin.TabularInline):
+    model = PriceTier
+    extra = 1
+    fields = ("min_quantity", "price")
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("name", "sku", "category", "stock_quantity", "stock_state", "badge_en", "is_active")
+    list_filter = ("category", BadgeAdminFilter, "is_active")
+    list_editable = ("stock_quantity", "is_active")  # quick daily edit without opening the product
+    search_fields = ("name", "sku")
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = [ProductImageInline, PriceTierInline]
+
+    @admin.display(description="Stock status")
+    def stock_state(self, obj):
+        if obj.is_sold_out:
+            return "🔴 Out of stock"
+        if obj.is_low_stock:
+            return "🟡 Low stock"
+        return "🟢 In stock"
+
+    @admin.display(description="Badge")
+    def badge_en(self, obj):
+        return BADGE_LABELS_EN.get(obj.badge, obj.badge)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        # Swap the dropdown's labels to English when editing a product in
+        # admin — the stored value ("popular", "deal", ...) is unchanged,
+        # so the site's own Turkish get_badge_display() is unaffected.
+        if db_field.name == "badge":
+            kwargs["choices"] = list(BADGE_LABELS_EN.items())
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "order")
+    prepopulated_fields = {"slug": ("name",)}

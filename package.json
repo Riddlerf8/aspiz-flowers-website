@@ -1,0 +1,12 @@
+{
+  "name": "shop_project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --minify",
+    "watch:css": "tailwindcss -i ./static/src/input.css -o ./static/src/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}

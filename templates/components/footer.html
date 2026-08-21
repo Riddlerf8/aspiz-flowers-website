@@ -1,0 +1,58 @@
+<!-- TODO: gerçek adres/telefon/e-posta bilgilerinizi girin -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="{% url 'core:home' %}" class="footer-logo">
+          <i class="fa-solid fa-leaf"></i>
+          <div class="footer-logo-text">
+            <span class="footer-brand-name">YAPAY ÇİÇEK</span>
+            <span class="footer-brand-sub">DEPOSU</span>
+          </div>
+        </a>
+        <p class="footer-desc">Kaliteli ve dekoratif yapay çiçekler, toptan ve perakende.</p>
+        <ul class="footer-contact">
+          <li>
+            <span class="footer-icon-box"><i class="fa-solid fa-location-dot"></i></span>
+            <span>[Mağaza / depo adresinizi buraya yazın]</span>
+          </li>
+          <li>
+            <span class="footer-icon-box"><i class="fa-brands fa-whatsapp"></i></span>
+            <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}">{{ shop_whatsapp_display }}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-col-title">Kurumsal</h3>
+        <ul class="footer-links">
+          <li><a href="{% url 'core:home' %}">Anasayfa</a></li>
+          <li><a href="{% url 'products:list' %}">Tüm Ürünler</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'orders:history' %}">Siparişlerim</a></li>
+          {% else %}
+            <li><a href="{% url 'accounts:login' %}">Giriş Yap</a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-col-title">Kategoriler</h3>
+        <ul class="footer-links">
+          {% for cat in nav_categories %}
+            <li><a href="{% url 'products:by_category' cat.slug %}">{{ cat.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="footer-bottom">
+      <p class="footer-copyright">&copy; {% now "Y" %} Yapay Çiçek Deposu &middot; Tüm hakları saklıdır.</p>
+      <div class="footer-bottom-right">
+        <a href="#" class="footer-social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Tüm Ürünler{% endif %} - Çiçek Deposu{% endblock %}
+{% block content %}
+  {% include "components/category_bar.html" with categories=categories %}
+
+  <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-4">
+    {% if category %}{{ category.name }}
+    {% elif query %}"{{ query }}" için sonuçlar
+    {% elif active_filter == "new" %}Yeni Ürünler
+    {% elif active_filter == "deal" %}Fırsat Ürünleri
+    {% elif active_filter == "popular" %}Popüler Ürünler
+    {% else %}Tüm Ürünler{% endif %}
+  </h1>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" data-product-grid>
+    {% for product in products %}
+      {% include "components/product_card.html" with product=product %}
+    {% empty %}
+      <p class="col-span-full text-sm text-wine-300 dark:text-[#a39c8f]">Ürün bulunamadı.</p>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_next %}
+    <div class="flex justify-center mt-8">
+      <button type="button" data-load-more-btn
+              data-next-url="?page={{ page_obj.next_page_number }}{% if active_category %}&category={{ active_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&filter={{ active_filter }}{% endif %}"
+              class="text-sm font-medium text-wine-700 dark:text-[#f5f3ef] border border-cream-200 dark:border-white/10 rounded-pill px-8 py-2.5 hover:bg-cream-100 dark:hover:bg-white/5 transition">
+        Daha Fazla Göster
+      </button>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'vendor/js/load-more.js' %}" defer></script>
+{% endblock %}

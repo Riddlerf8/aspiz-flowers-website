@@ -1,0 +1,29 @@
+{% comment %}
+Usage: {% include "components/category_bar.html" with categories=categories %}
+Ürün listesi sayfasının üstünde yatay kategori filtre çubuğu.
+"active_category" (slug) parent context'ten (product_list/category_detail view'i)
+otomatik geliyor çünkü include "only" ile izole edilmemiş.
+{% endcomment %}
+<div class="flex items-center gap-2 overflow-x-auto pb-3 mb-4 -mx-1 px-1" data-category-bar>
+  <a href="{% url 'products:list' %}{% if query %}?q={{ query }}{% endif %}"
+     class="whitespace-nowrap text-xs font-medium rounded-pill px-4 py-2 border transition
+            {% if not active_category %}
+              bg-wine-800 border-wine-800 text-white dark:bg-[#e8dfc8] dark:border-[#e8dfc8] dark:text-[#1c1c1c]
+            {% else %}
+              border-cream-200 dark:border-white/10 text-wine-700 dark:text-[#a39c8f] hover:bg-cream-100 dark:hover:bg-white/5
+            {% endif %}">
+    Tüm Ürünler
+  </a>
+
+  {% for cat in categories %}
+    <a href="{% url 'products:by_category' cat.slug %}"
+       class="whitespace-nowrap text-xs font-medium rounded-pill px-4 py-2 border transition
+              {% if active_category == cat.slug %}
+                bg-wine-800 border-wine-800 text-white dark:bg-[#e8dfc8] dark:border-[#e8dfc8] dark:text-[#1c1c1c]
+              {% else %}
+                border-cream-200 dark:border-white/10 text-wine-700 dark:text-[#a39c8f] hover:bg-cream-100 dark:hover:bg-white/5
+              {% endif %}">
+      {{ cat.name }}
+    </a>
+  {% endfor %}
+</div>

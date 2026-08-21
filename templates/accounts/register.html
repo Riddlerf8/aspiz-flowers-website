@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Kayıt Ol - Çiçek Deposu{% endblock %}
+{% block content %}
+  <div class="max-w-sm mx-auto bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 p-6">
+    <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6 text-center">Kayıt Ol</h1>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:request.POST.next }}">
+      {% for field in form %}
+        <div>
+          <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<p class="text-[11px] text-wine-300 dark:text-[#8a7355] mt-1">{{ field.help_text }}</p>{% endif %}
+          {% for error in field.errors %}
+            <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-2.5 font-medium">
+        Kayıt Ol
+      </button>
+    </form>
+    <p class="text-center text-sm text-wine-400 dark:text-[#a39c8f] mt-4">
+      Zaten hesabınız var mı? <a href="{% url 'accounts:login' %}" class="text-wine-700 dark:text-[#e8dfc8] underline">Giriş yapın</a>
+    </p>
+  </div>
+{% endblock %}

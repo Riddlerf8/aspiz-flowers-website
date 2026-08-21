@@ -1,0 +1,67 @@
+from django.conf import settings
+from django.db import models
+
+from apps.products.models import Product
+
+
+class Cart(models.Model):
+    """
+    A cart belongs to either a logged-in user OR an anonymous session key,
+    never both being empty. This lets guests shop and, on login, we merge
+    their session cart into their account cart (see get_cart in cart.py).
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="carts", null=True, blank=True,
+    )
+    session_key = models.CharField(max_length=40, null=True, blank=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(user__isnull=False) | models.Q(session_key__isnull=False),
+                name="cart_must_have_user_or_session",
+            )
+        ]
+
+    def __str__(self):
+        return f"Cart #{self.pk} ({self.user or self.session_key})"
+
+    @property
+    def total_items(self):
+        return sum(item.quantity for item in self.items.all())
+
+    @property
+    def total_price(self):
+        return sum(item.line_total for item in self.items.all())
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_items")
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("cart", "product")
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    @property
+    def unit_price(self):
+        """Uses the best applicable wholesale tier price, falling back to
+        the lowest tier price if the ordered quantity is below every tier."""
+        tiers = list(self.product.price_tiers.order_by("-min_quantity"))
+        for tier in tiers:
+            if self.quantity >= tier.min_quantity:
+                return tier.price
+        if tiers:
+            return tiers[-1].price
+        return 0
+
+    @property
+    def line_total(self):
+        return self.unit_price * self.quantity

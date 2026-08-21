@@ -1,0 +1,193 @@
+{% load static %}
+
+<div class="preloader" data-preloader></div>
+<div class="overlay" data-overlay data-nav-toggler></div>
+
+<header class="header-complex" data-header>
+  <!-- 1. Top Banner (Video Hero) -->
+  <div class="top-banner">
+    <video class="top-banner-media" autoplay muted loop playsinline preload="auto"
+      poster="{% static 'vendor/img/hero-flowers.jpg' %}">
+      <source src="{% static 'vendor/video/hero-banner.mp4' %}" type="video/mp4">
+      <img class="top-banner-media" src="{% static 'vendor/img/hero-flowers.jpg' %}" alt="Yapay çiçek deposu">
+    </video>
+    <div class="top-banner-overlay"></div>
+    <div class="container top-banner-content">
+      <span class="top-banner-eyebrow">En özel ürünlerle</span>
+      <h2>Türkiye'nin En Büyük Çiçek Deposu</h2>
+    </div>
+  </div>
+
+  <!-- ۱. Top Info Bar -->
+  <div class="top-info-bar">
+    <div class="container">
+
+      <div class="top-info-right">
+        <i class="fa-brands fa-whatsapp"></i> {{ shop_whatsapp_display }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ۲. Main Header شناور و شیشه‌ای -->
+  <div class="main-header-wrapper">
+    <div class="main-header glass-floating-oval">
+      <div class="container header-content">
+
+        <!-- لوگو -->
+        <a href="{% url 'core:home' %}" class="logo-area">
+          <i class="fa-solid fa-leaf"></i> ÇİÇEK
+        </a>
+
+        <!-- سرچ باکس -->
+        <form class="search-box" action="{% url 'products:list' %}" method="get" data-search-container
+          autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" name="q" value="{{ request.GET.q }}" data-search-input
+            placeholder="Aradığınız ürünün adını yazınız..." autocomplete="off">
+          <button type="submit" data-search-submit>ARA</button>
+
+          <div class="search-results" data-search-results></div>
+        </form>
+
+        <!-- دکمه‌ها و اکشن‌ها -->
+        <div class="header-actions">
+          <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button" aria-label="Temayı değiştir">
+            <i class="fa-solid fa-moon moon-icon"></i>
+            <i class="fa-solid fa-sun sun-icon"></i>
+          </button>
+
+          {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}" class="icon-action-btn" aria-label="Hesabım">
+            <i class="fa-regular fa-user"></i>
+          </a>
+          {% else %}
+          <button type="button" class="icon-action-btn" data-login-open="login" aria-label="Giriş Yap">
+            <i class="fa-regular fa-user"></i>
+          </button>
+          {% endif %}
+
+          <a href="{% url 'cart:detail' %}" class="icon-action-btn cart-btn" data-cart-open
+            aria-label="Sepetim, {{ cart_item_count|default:0 }} ürün">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count" data-cart-count>{{ cart_item_count|default:0 }}</span>
+          </a>
+
+          <button class="nav-open-btn" type="button" aria-label="open menu" data-nav-toggler>
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ۳. Mobile Sidebar -->
+  <nav class="mobile-sidebar" data-navbar>
+    <div class="sidebar-header">
+      <a href="{% url 'core:home' %}" class="sidebar-logo">
+        <i class="fa-solid fa-leaf"></i>
+        <div class="logo-text">
+          <span class="brand-name">ÇİÇEK</span>
+          <span class="brand-sub">DEPOSU</span>
+        </div>
+      </a>
+      <button class="nav-close-btn" type="button" aria-label="close menu" data-nav-toggler>
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-content">
+      <div class="sidebar-section">
+        <h3 class="section-title">KURUMSAL</h3>
+        <ul class="sidebar-links">
+          <li><a href="{% url 'core:home' %}">Anasayfa</a></li>
+          <li><a href="{% url 'products:list' %}">Tüm Ürünler</a></li>
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'orders:history' %}">Siparişlerim</a></li>
+          <li><a href="{% url 'accounts:profile' %}">Hesabım</a></li>
+          {% else %}
+          <li><button type="button" class="sidebar-link-btn" data-login-open="login">Giriş Yap</button></li>
+          <li><button type="button" class="sidebar-link-btn" data-login-open="register">Kayıt Ol</button></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="section-title">KATEGORİLER</h3>
+        <ul class="sidebar-links">
+          {% for cat in nav_categories %}
+          <li><a href="{% url 'products:by_category' cat.slug %}">{{ cat.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="section-title">İLETİŞİM</h3>
+        <div class="contact-list">
+          <div class="contact-item">
+            <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
+            <div class="contact-info">
+              <strong>Adres</strong>
+              <p>[Mağaza / depo adresinizi buraya yazın]</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon-box"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="contact-info">
+              <strong>WhatsApp</strong>
+              <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}">{{ shop_whatsapp_display }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="#" class="instagram-link">
+        <div class="icon-box-sm"><i class="fa-brands fa-instagram"></i></div>
+        <span>INSTAGRAM</span>
+      </a>
+      <p class="copyright-text">&copy; {% now "Y" %} Yapay Çiçek Deposu</p>
+    </div>
+  </nav>
+
+  <!-- ۴. Main Nav (دسته بندی‌ها) -->
+  {% if nav_categories %}
+  <nav class="main-nav">
+    <div class="container">
+      <ul>
+        {% for cat in nav_categories %}
+        <li><a href="{% url 'products:by_category' cat.slug %}"><i class="fa-solid fa-leaf"></i> {{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- ۵. Popular products circular slider -->
+  {% if featured_products %}
+  <div class="category-slider">
+    <div class="container">
+      <button class="slider-btn prev" type="button" data-slider-prev><i class="fa-solid fa-chevron-left"></i></button>
+      <div class="slider-track" data-slider-track>
+        {% for product in featured_products %}
+        <a href="{{ product.get_absolute_url }}" class="cat-item">
+          <div class="img-box">
+            {% if product.primary_image %}
+            <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" width="70" height="70"
+              loading="lazy"
+              onerror="this.replaceWith(Object.assign(document.createElement('i'), {className: 'fa-solid fa-seedling'}))">
+            {% else %}
+            <i class="fa-solid fa-seedling"></i>
+            {% endif %}
+          </div>
+          <span>{{ product.name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      <button class="slider-btn next" type="button" data-slider-next><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+  {% endif %}
+
+</header>

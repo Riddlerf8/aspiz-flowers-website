@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" class="dark-mode">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#12080c">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Yapay Çiçek Deposu{% endblock %}</title>
+
+  <!-- Tema flaşını (yanlış renkte açılıp sonra değişmesini) önlemek için
+       localStorage'daki tercih CSS/JS yüklenmeden ÖNCE uygulanıyor. -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem("theme");
+      var isDark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.toggle("dark-mode", isDark);
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Site-wide görsel dil (referans tasarımdan): renkler, dark mode, header/footer -->
+  <link rel="stylesheet" href="{% static 'vendor/css/site.css' %}">
+  <!-- Tailwind: ürün grid/kart/form gibi iç sayfa bileşenleri için, sonraki aşamada
+       kademeli olarak site.css'e taşınacak -->
+  <link rel="stylesheet" href="{% static 'src/output.css' %}">
+
+  <style>
+    /* site.css bir sticky-footer kuralı vermiyor; Tailwind'in body sınıflarını
+       (renk çakışmasını önlemek için) kaldırdığımızdan burada minimal olarak ekliyoruz */
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  {% include "components/header.html" %}
+  {% include "components/auth_modal.html" %}
+  {% include "components/cart_modal.html" %}
+
+  {% if messages %}
+    <div class="container" style="margin-top: 1rem; display: flex; flex-direction: column; gap: .5rem;">
+      {% for message in messages %}
+        <div class="site-alert site-alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main id="main-content" class="container" style="padding-top: 1.5rem; padding-bottom: 1.5rem;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div data-whatsapp-float>
+    <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}?text={{ 'Merhaba, ürünleriniz hakkında bilgi almak istiyorum.'|urlencode }}"
+       class="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp üzerinden bize ulaşın">
+      <i class="fa-brands fa-whatsapp"></i>
+    </a>
+  </div>
+
+  {% include "components/footer.html" %}
+
+  <script>
+    // CSRF-aware helper for the AJAX "add to cart" buttons on product cards.
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-action="add-to-cart"]');
+      if (!btn || btn.disabled) return;
+      const productId = btn.dataset.productId;
+      fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'quantity=1',
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.ok) {
+            document.querySelectorAll('[data-cart-count]').forEach((el) => {
+              el.textContent = data.cart_item_count;
+            });
+          } else {
+            alert(data.error || 'Bir hata oluştu.');
+          }
+        })
+        .catch(() => alert('Sepete eklenirken bir hata oluştu.'));
+    });
+  </script>
+  <script src="{% static 'vendor/js/theme.js' %}" defer></script>
+  <script src="{% static 'vendor/js/site-core.js' %}" defer></script>
+  <script src="{% static 'vendor/js/search.js' %}" defer></script>
+  <script src="{% static 'vendor/js/slider.js' %}" defer></script>
+  <script src="{% static 'vendor/js/auth-modal.js' %}" defer></script>
+  <script src="{% static 'vendor/js/cart.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

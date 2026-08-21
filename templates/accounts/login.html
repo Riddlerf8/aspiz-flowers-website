@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Giriş Yap - Çiçek Deposu{% endblock %}
+{% block content %}
+  <div class="max-w-sm mx-auto bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 p-6">
+    <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6 text-center">Giriş Yap</h1>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% for field in form %}
+        <div>
+          <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}
+            <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <p class="text-xs text-red-500">{{ error }}</p>
+      {% endfor %}
+      <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-2.5 font-medium">
+        Giriş Yap
+      </button>
+    </form>
+    <p class="text-center text-sm text-wine-400 dark:text-[#a39c8f] mt-4">
+      Hesabınız yok mu? <a href="{% url 'accounts:register' %}" class="text-wine-700 dark:text-[#e8dfc8] underline">Kayıt olun</a>
+    </p>
+  </div>
+{% endblock %}

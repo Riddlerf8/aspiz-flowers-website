@@ -1,0 +1,42 @@
+{% load static %}
+<!-- Aynı shell (login-modal) referans tasarımdaki gibi tekrar kullanılıyor.
+     İçerik JS ile /cart/state/ ve /cart/add|update|remove/ endpoint'lerinden
+     dolduruluyor — localStorage yok, hepsi gerçek Django sepeti. -->
+<div class="login-modal cart-modal" data-cart-modal aria-hidden="true">
+  <div class="login-modal-overlay" data-cart-close></div>
+  <div class="login-modal-panel cart-modal-panel" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+    <button type="button" class="login-modal-close" data-cart-close aria-label="Kapat">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="cart-modal-body">
+      <div class="cart-modal-header">
+        <h2 id="cartModalTitle"><i class="fa-solid fa-cart-shopping"></i> Sepetim</h2>
+        <span class="cart-modal-count" data-cart-modal-count>0 ürün</span>
+      </div>
+
+      <div class="cart-empty-state" data-cart-empty hidden>
+        <i class="fa-solid fa-basket-shopping"></i>
+        <p>Sepetiniz henüz boş</p>
+        <span>Beğendiğiniz ürünleri sepete ekleyerek alışverişe başlayın.</span>
+        <button type="button" class="cart-btn-shop" data-cart-close>Alışverişe Başla</button>
+      </div>
+
+      <div class="cart-loading-state" data-cart-loading>
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+
+      <ul class="cart-items-list" data-cart-items hidden></ul>
+
+      <div class="cart-modal-footer" data-cart-footer hidden>
+        <div class="cart-total-row">
+          <span>Ara Toplam</span>
+          <strong data-cart-total>0 ₺</strong>
+        </div>
+        <a href="{% url 'orders:checkout' %}" class="cart-checkout-btn" data-cart-checkout>
+          Ödemeye Geç <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
