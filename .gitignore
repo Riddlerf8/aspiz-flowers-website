@@ -1,11 +1,1 @@
-venv/
-__pycache__/
-*.pyc
-.env
-node_modules/
-staticfiles/
-media/
-static/src/output.css
-db.sqlite3
-*.log
-.DS_Store
+
