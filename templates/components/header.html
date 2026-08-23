@@ -6,10 +6,8 @@
 <header class="header-complex" data-header>
   <!-- 1. Top Banner (Video Hero) -->
   <div class="top-banner">
-    <video class="top-banner-media" autoplay muted loop playsinline preload="auto"
-      poster="{% static 'vendor/img/hero-flowers.jpg' %}">
+    <video class="top-banner-media" autoplay muted loop playsinline preload="auto">
       <source src="{% static 'vendor/video/hero-banner.mp4' %}" type="video/mp4">
-      <img class="top-banner-media" src="{% static 'vendor/img/hero-flowers.jpg' %}" alt="Yapay çiçek deposu">
     </video>
     <div class="top-banner-overlay"></div>
     <div class="container top-banner-content">
@@ -19,9 +17,12 @@
   </div>
 
   <!-- ۱. Top Info Bar -->
+  <!-- ۱. Top Info Bar -->
   <div class="top-info-bar">
     <div class="container">
-
+      <div class="top-info-left">
+        <!-- اگه چیز دیگه‌ای مثل ایمیل یا پیام خوش‌آمدگویی داری اینجا بذار -->
+      </div>
       <div class="top-info-right">
         <i class="fa-brands fa-whatsapp"></i> {{ shop_whatsapp_display }}
       </div>

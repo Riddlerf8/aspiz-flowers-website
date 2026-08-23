@@ -1,29 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Giriş Yap - Çiçek Deposu{% endblock %}
+
 {% block content %}
-  <div class="max-w-sm mx-auto bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 p-6">
-    <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6 text-center">Giriş Yap</h1>
+  <div class="max-w-sm mx-auto bg-white/50 dark:bg-[#1c1c1c]/70 backdrop-blur-md rounded-2xl border border-white/60 dark:border-white/10 p-6 shadow-xl my-8">
+    <h1 class="font-serif text-xl text-[#6b2138] dark:text-[#f5f3ef] mb-6 text-center font-bold">Giriş Yap</h1>
+    
     <form method="post" class="space-y-4">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ next }}">
+      
       {% for field in form %}
         <div>
-          <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
-          {{ field }}
+          <label class="block text-xs font-semibold text-[#6b2138] dark:text-[#a39c8f] mb-1.5">{{ field.label }}</label>
+          <div class="relative flex items-center">
+            {{ field }}
+          </div>
           {% for error in field.errors %}
             <p class="text-xs text-red-500 mt-1">{{ error }}</p>
           {% endfor %}
         </div>
       {% endfor %}
+
       {% for error in form.non_field_errors %}
         <p class="text-xs text-red-500">{{ error }}</p>
       {% endfor %}
-      <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-2.5 font-medium">
-        Giriş Yap
+
+      <!-- دکمه ورود کاملاً پررنگ و صورتی/زرشکی -->
+      <button type="submit" style="background-color: #a86b81 !important; color: #ffffff !important;" class="w-full rounded-xl py-2.5 font-medium transition-all duration-300 shadow-md hover:opacity-90 flex items-center justify-center gap-2 mt-4 cursor-pointer">
+        <span>Giriş Yap</span>
+        <i class="fa-solid fa-arrow-right text-sm"></i>
       </button>
     </form>
-    <p class="text-center text-sm text-wine-400 dark:text-[#a39c8f] mt-4">
-      Hesabınız yok mu? <a href="{% url 'accounts:register' %}" class="text-wine-700 dark:text-[#e8dfc8] underline">Kayıt olun</a>
+
+    <p class="text-center text-sm text-[#6b2138] dark:text-[#a39c8f] mt-5">
+      Hesabınız yok mu? <a href="{% url 'accounts:register' %}" class="text-[#a86b81] dark:text-[#e8dfc8] font-semibold underline">Kayıt olun</a>
     </p>
   </div>
 {% endblock %}

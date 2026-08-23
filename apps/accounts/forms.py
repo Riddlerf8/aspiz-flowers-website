@@ -1,12 +1,24 @@
 import re
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserCreationForm,
+)
 
 from .models import User
 
 
-INPUT_CLASS = "w-full rounded-lg border border-cream-200 px-3 py-2 text-sm focus:outline-none focus:border-wine-400"
+# bg-white/text-wine-900 burada bilerek belirtiliyor: <meta name="color-scheme"
+# content="light dark"> (base.html) yüzünden, rengi belirtilmemiş input/textarea'lar
+# tarayıcının karanlık moduna göre siyah kutu olarak render edilebiliyordu.
+INPUT_CLASS = (
+    "w-full rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm "
+    "bg-white text-wine-900 placeholder-wine-300 dark:bg-[#1c1c1c] dark:text-[#f5f3ef] "
+    "focus:outline-none focus:border-wine-400"
+)
 
 
 def _unique_username_from_email(email):
@@ -88,9 +100,37 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Bu form giriş modalıyla aynı görsel dili kullanıyor (bkz.
+        # templates/accounts/profile.html + site.css bölüm 7/10: .form-group,
+        # .input-with-icon). Buradaki class'lar Tailwind değil, o CSS
+        # sınıflarıyla eşleşiyor; bilerek INPUT_CLASS kullanmıyoruz.
         for name, field in self.fields.items():
             if name == "address":
-                field.widget.attrs.setdefault("class", INPUT_CLASS)
                 field.widget.attrs.setdefault("rows", 3)
-            else:
-                field.widget.attrs.setdefault("class", INPUT_CLASS)
+            field.widget.attrs.setdefault("autocomplete", "off")
+
+    def clean_email(self):
+        # RegisterForm already blocks duplicate emails at sign-up, but
+        # nothing stopped someone from later editing their profile email to
+        # match another account here — the DB unique constraint (see
+        # migration 0003) would then reject the save with an ugly
+        # IntegrityError instead of a normal form error. This catches it
+        # early with a proper Turkish message.
+        email = self.cleaned_data["email"]
+        exists = User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists()
+        if exists:
+            raise forms.ValidationError("Bu e-posta adresi zaten kullanılıyor.")
+        return email
+
+
+class StyledPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget.attrs.setdefault("class", INPUT_CLASS)
+
+
+class StyledSetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", INPUT_CLASS)

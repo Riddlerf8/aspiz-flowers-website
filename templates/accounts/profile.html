@@ -1,41 +1,117 @@
 {% extends "base.html" %}
 {% block title %}Profilim - Çiçek Deposu{% endblock %}
 {% block content %}
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <div class="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 p-6">
-      <h1 class="font-serif text-lg text-wine-900 dark:text-[#f5f3ef] mb-4">Profil Bilgileri</h1>
-      <form method="post" class="space-y-4">
-        {% csrf_token %}
-        {% for field in form %}
+  <div class="account-page">
+    <div class="account-grid">
+
+      <div class="account-card">
+        <div class="account-card-header">
+          <div class="account-avatar"><i class="fa-regular fa-user"></i></div>
           <div>
-            <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
-            {{ field }}
-            {% for error in field.errors %}
-              <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+            <h1>Profil Bilgileri</h1>
+            <p>Hesap bilgilerinizi buradan güncelleyebilirsiniz.</p>
+          </div>
+        </div>
+
+        <form method="post" class="account-form">
+          {% csrf_token %}
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.first_name.id_for_label }}">Adı</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user field-icon"></i>
+                {{ form.first_name }}
+              </div>
+              {% for error in form.first_name.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.last_name.id_for_label }}">Soyadı</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user field-icon"></i>
+                {{ form.last_name }}
+              </div>
+              {% for error in form.last_name.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">E-posta Adresi</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope field-icon"></i>
+              {{ form.email }}
+            </div>
+            {% for error in form.email.errors %}
+              <span class="error-message">{{ error }}</span>
             {% endfor %}
           </div>
-        {% endfor %}
-        <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-2.5 font-medium">
-          Kaydet
-        </button>
-      </form>
-    </div>
 
-    <div>
-      <h2 class="font-serif text-lg text-wine-900 dark:text-[#f5f3ef] mb-4">Son Siparişlerim</h2>
-      {% if orders %}
-        <div class="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 divide-y divide-cream-100">
-          {% for order in orders %}
-            <a href="{% url 'orders:detail' order.pk %}" class="flex items-center justify-between p-3 hover:bg-cream-50 text-sm">
-              <span>#{{ order.pk }} - {{ order.get_status_display }}</span>
-              <span class="font-semibold">{{ order.total }}$</span>
-            </a>
+          <div class="form-group">
+            <label for="{{ form.phone.id_for_label }}">Telefon</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-phone field-icon"></i>
+              {{ form.phone }}
+            </div>
+            {% for error in form.phone.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.address.id_for_label }}">Adres</label>
+            <div class="input-with-icon input-with-icon-top">
+              <i class="fa-solid fa-location-dot field-icon"></i>
+              {{ form.address }}
+            </div>
+            {% for error in form.address.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          {% for error in form.non_field_errors %}
+            <span class="error-message">{{ error }}</span>
           {% endfor %}
+
+          <button type="submit" class="login-btn">
+            <span class="btn-label">Kaydet</span>
+            <i class="fa-solid fa-check"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="account-card">
+        <div class="account-card-header">
+          <div class="account-avatar"><i class="fa-solid fa-bag-shopping"></i></div>
+          <div>
+            <h1>Son Siparişlerim</h1>
+            <p>En son verdiğiniz siparişlerin özeti.</p>
+          </div>
         </div>
-      {% else %}
-        <p class="text-wine-300 dark:text-[#8a7355] text-sm">Henüz siparişiniz yok.</p>
-      {% endif %}
-      <a href="{% url 'orders:history' %}" class="block text-sm text-wine-600 dark:text-[#d8cdbd] hover:text-wine-900 dark:hover:text-[#f5f3ef] underline mt-3">Tüm siparişleri gör</a>
+
+        {% if orders %}
+          <div class="order-list">
+            {% for order in orders %}
+              <a href="{% url 'orders:detail' order.pk %}" class="order-row">
+                <span class="order-id">#{{ order.pk }}</span>
+                <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+                <span class="order-total">{{ order.total }}$</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="account-empty">Henüz siparişiniz yok.</p>
+        {% endif %}
+
+        <a href="{% url 'orders:history' %}" class="inline-link account-view-all">
+          Tüm siparişleri gör <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
     </div>
   </div>
 {% endblock %}

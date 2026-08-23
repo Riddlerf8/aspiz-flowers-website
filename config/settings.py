@@ -1,8 +1,8 @@
-
 from pathlib import Path
 import os
 import sys
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,9 +13,31 @@ load_dotenv(BASE_DIR / ".env")
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
-DEBUG = os.getenv("DEBUG", "True") == "True"
+# DEBUG defaults to False now (fail-safe): a missing/broken .env on a real
+# server must never silently turn debug mode on. Local dev sets DEBUG=True
+# explicitly in .env instead.
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+# SECRET_KEY has no insecure fallback anymore. In DEBUG mode we still allow
+# a fixed dev-only value so `runserver` works out of the box; in production
+# (DEBUG=False) a missing SECRET_KEY now hard-crashes startup instead of
+# silently running with a publicly-known key.
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-only-insecure-key-do-not-use-in-production"
+    else:
+        raise ImproperlyConfigured(
+            "SECRET_KEY ortam değişkeni tanımlı değil. .env dosyasını kontrol edin "
+            "— production'da gerçek bir SECRET_KEY olmadan uygulama başlatılamaz."
+        )
+
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+
+# Admin panel path is configurable so it doesn't sit on the well-known
+# "/admin/" URL that every scanner/bot probes by default. Set ADMIN_URL in
+# .env for production (must end with "/"), e.g. ADMIN_URL=y-panel-x9k2/
+ADMIN_URL = os.getenv("ADMIN_URL", "admin/")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -36,6 +58,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves collected static files directly from the app process — no
+    # Nginx "static location" config needed. Must sit right after
+    # SecurityMiddleware and before everything else (whitenoise docs).
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "config.middleware.AdminLanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -115,8 +141,33 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# CompressedManifestStaticFilesStorage: whitenoise serves these with far-future
+# cache headers safely, because each collectstatic run renames files with a
+# content hash (site.abc123.css) — browsers/CDNs can cache "forever" without
+# ever serving a stale file after a deploy. Requires `collectstatic` to be run
+# after every deploy (it already was for STATIC_ROOT to have anything in it).
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Serve user-uploaded product/category photos even with DEBUG=False.
+# Whitenoise is for STATIC files (checked into the repo, known at deploy
+# time); MEDIA files are uploaded at runtime through /admin/, so they can't
+# be pre-hashed/collected the same way. django.views.static.serve is not as
+# fast as Nginx under heavy concurrent load, but for a small/medium wholesale
+# catalog (a few hundred products, not millions of requests/sec) it's fine
+# and means media works without any extra web-server config. If traffic ever
+# grows enough to matter, move MEDIA serving to Nginx or S3-compatible
+# storage — see MEDIA_URL routing in config/urls.py.
+SERVE_MEDIA_VIA_DJANGO = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -129,6 +180,19 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# Set BEHIND_PROXY=True in .env when deploying behind Nginx/Cloudflare with
+# SSL terminated at the proxy. Without this, SECURE_SSL_REDIRECT above can't
+# tell the original request was already HTTPS and causes a redirect loop.
+if os.getenv("BEHIND_PROXY", "False") == "True":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# CSRF_TRUSTED_ORIGINS is required by Django when the site is served over
+# HTTPS behind a proxy/CDN on a real domain. Comma-separated full origins,
+# e.g. CSRF_TRUSTED_ORIGINS=https://cicekdeposu.com,https://www.cicekdeposu.com
+_csrf_trusted = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+if _csrf_trusted:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_trusted.split(",") if origin.strip()]
 
 MESSAGE_TAGS = {
     10: "debug",
@@ -154,3 +218,42 @@ WHATSAPP_TEMPLATE_LANGUAGE = os.getenv("WHATSAPP_TEMPLATE_LANGUAGE", "tr")
 # (points staff to the admin page for that order). Set this to your real
 # domain in production, e.g. https://cicekdeposu.com
 SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8000")
+
+# --- Email (used for "şifremi unuttum" password reset) ---
+# If EMAIL_HOST/EMAIL_HOST_USER/EMAIL_HOST_PASSWORD aren't all set yet
+# (waiting on real SMTP credentials), fall back to Django's console backend
+# — password reset emails print to the server log instead of erroring out,
+# so the rest of the site keeps working while SMTP isn't configured yet.
+# See .env.example for where to get these from your email provider.
+_email_configured = all([
+    os.getenv("EMAIL_HOST"),
+    os.getenv("EMAIL_HOST_USER"),
+    os.getenv("EMAIL_HOST_PASSWORD"),
+])
+if _email_configured:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.getenv("EMAIL_HOST")
+    EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+    EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@cicekdeposu.com")
+
+# Password reset links expire after this long (Django default is 3 days;
+# kept explicit here so it's easy to find/tune).
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3  # 3 days, in seconds
+
+# --- Google OAuth login ("Google ile giriş yap") ---
+# Blank until real values are added to .env — GOOGLE_OAUTH_ENABLED reflects
+# whether both are set, so templates/views can hide the button until then
+# instead of showing a broken login option.
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
+# Must exactly match an "Authorized redirect URI" configured for this
+# OAuth client in Google Cloud Console -> APIs & Services -> Credentials.
+GOOGLE_OAUTH_REDIRECT_URI = f"{SITE_BASE_URL}/accounts/google/callback/"

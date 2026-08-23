@@ -9,6 +9,22 @@ from apps.products.models import Product
 from . import cart as cart_service
 
 
+def _parse_quantity(raw, default=1):
+    """
+    request.POST.get("quantity") can be missing, empty, or garbage (e.g. a
+    hand-crafted request with quantity=abc) — int() on that raises
+    ValueError/TypeError and used to bubble up as an unhandled 500. Missing
+    values keep the old default-of-1 behavior; anything unparsable returns
+    None so callers can respond with a normal validation error instead.
+    """
+    if raw is None or raw == "":
+        return default
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
+
+
 def _cart_json(cart):
     """
     Shared serializer for every cart AJAX endpoint (add/update/remove/state)
@@ -50,8 +66,15 @@ def cart_state(request):
 @require_POST
 def cart_add(request, product_id):
     product = get_object_or_404(Product, pk=product_id, is_active=True)
-    quantity = int(request.POST.get("quantity", 1))
+    quantity = _parse_quantity(request.POST.get("quantity"))
     is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+    if quantity is None:
+        error = "Geçersiz adet."
+        if is_ajax:
+            return JsonResponse({"ok": False, "error": error}, status=400)
+        messages.error(request, error)
+        return redirect(product.get_absolute_url())
 
     try:
         cart_service.add_to_cart(request, product, quantity)
@@ -70,8 +93,15 @@ def cart_add(request, product_id):
 
 @require_POST
 def cart_update(request, product_id):
-    quantity = int(request.POST.get("quantity", 1))
+    quantity = _parse_quantity(request.POST.get("quantity"))
     is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+    if quantity is None:
+        error = "Geçersiz adet."
+        if is_ajax:
+            return JsonResponse({"ok": False, "error": error}, status=400)
+        messages.error(request, error)
+        return redirect("cart:detail")
 
     try:
         cart_service.update_quantity(request, product_id, quantity)

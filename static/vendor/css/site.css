@@ -77,10 +77,15 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   outline-offset: 2px;
 }
 
+/* تنظیم عرض استاندارد و جلوگیری از چسبیدن در حالت 100% */
 .container {
-  max-width: var(--container-width);
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  max-width: 1200px !important; /* یا 1200px بسته به سلیقه‌ت */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1.5rem !important;  /* ایجاد فاصله ۳۲ پیکسلی از دیوار چپ */
+  padding-right: 1.5rem !important; /* ایجاد فاصله ۳۲ پیکسلی از دیوار راست */
+  box-sizing: border-box !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -142,7 +147,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   color: #ffffff;
   border-bottom: 1px solid var(--border-color);
   text-align: center;
-  background: var(--bg-main) center/cover no-repeat url('/static/vendor/img/hero-flowers.jpg');
+  background: var(--bg-main);
 }
 
 .top-banner-media {
@@ -1120,9 +1125,7 @@ html.dark-mode .login-modal {
   justify-content: space-between;
   padding: 2.25rem 2.5rem;
   color: #ffffff;
-  background:
-    linear-gradient(160deg, rgba(38, 14, 23, 0.92) 0%, rgba(140, 42, 75, 0.88) 100%),
-    url('/static/vendor/img/header-banner.jpg') center/cover no-repeat;
+  background: linear-gradient(160deg, rgba(38, 14, 23, 0.92) 0%, rgba(140, 42, 75, 0.88) 100%);
   overflow: hidden;
 }
 
@@ -2375,3 +2378,457 @@ html[dir="rtl"] .footer-links a:hover {
 }
 
 .cart-loading-state.active { display: flex; }
+/* ==========================================================================
+   GLASSMORPHISM ACCOUNT & PROFILE PAGE (طرح شیشه‌ای برای کد جنگوی منصور)
+   ========================================================================== */
+
+.account-page {
+  padding: 2.5rem 0;
+  width: 100%;
+}
+
+/* شبکه دو کارت اصلی */
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* کارت‌های شیشه‌ای (Profil Bilgileri & Son Siparişlerim) */
+.account-card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 20px;
+  
+  /* افکت شیشه‌ای (Glassmorphism) برای لایت مود */
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+/* افکت شیشه‌ای برای دارک مود */
+html.dark-mode .account-card {
+  background: rgba(30, 15, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* هدر کارت‌ها */
+.account-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(168, 107, 129, 0.2);
+}
+
+.account-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: rgba(168, 107, 129, 0.15);
+  border: 1px solid rgba(168, 107, 129, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-rose, #a86b81);
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.account-card-header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main, #2b2b2b);
+  margin-bottom: 0.25rem;
+}
+
+.account-card-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted, #717171);
+}
+
+/* فرم و گروه‌ها */
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main, #2b2b2b);
+}
+
+/* ورودی‌های شیشه‌ای جنگو (Input, Textarea, Select) */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon-top {
+  align-items: flex-start;
+}
+
+.input-with-icon-top .field-icon {
+  top: 14px;
+}
+
+.input-with-icon .field-icon {
+  position: absolute;
+  inset-inline-start: 14px;
+  color: var(--accent-rose, #a86b81);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* استایل دادن به فیلدهای خود جنگو که رندر می‌شن */
+.input-with-icon input,
+.input-with-icon textarea,
+.input-with-icon select {
+  width: 100%;
+  padding: 11px 14px 11px 42px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: var(--text-main, #2b2b2b);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(168, 107, 129, 0.25);
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+html.dark-mode .input-with-icon input,
+html.dark-mode .input-with-icon textarea,
+html.dark-mode .input-with-icon select {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f5f3ef;
+}
+
+.input-with-icon input:focus,
+.input-with-icon textarea:focus,
+.input-with-icon select:focus {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--accent-rose, #a86b81);
+  box-shadow: 0 0 0 4px rgba(168, 107, 129, 0.15);
+}
+
+html.dark-mode .input-with-icon input:focus,
+html.dark-mode .input-with-icon textarea:focus,
+html.dark-mode .input-with-icon select:focus {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: var(--accent-rose, #a86b81);
+  box-shadow: 0 0 0 4px rgba(168, 107, 129, 0.25);
+}
+
+/* پیام‌های خطا */
+.error-message {
+  color: #e53e3e;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+/* دکمه Kaydet (ذخیره) */
+.login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #ffffff;
+  background: var(--accent-rose, #a86b81);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(168, 107, 129, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(168, 107, 129, 0.45);
+  filter: brightness(1.1);
+}
+
+/* لیست سفارشات (Son Siparişlerim) */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(168, 107, 129, 0.15);
+  text-decoration: none;
+  color: var(--text-main, #2b2b2b);
+  transition: all 0.25s ease;
+}
+
+html.dark-mode .order-row {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.order-row:hover {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--accent-rose, #a86b81);
+}
+
+html.dark-mode .order-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.order-id {
+  font-weight: 700;
+}
+
+.order-total {
+  font-weight: 600;
+  color: var(--accent-rose, #a86b81);
+}
+
+.account-empty {
+  color: var(--text-muted, #717171);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.account-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent-rose, #a86b81);
+  text-decoration: none;
+  transition: gap 0.2s ease;
+}
+
+.account-view-all:hover {
+  gap: 12px;
+}
+
+/* ریسپانسیو برای موبایل */
+@media screen and (max-width: 868px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+/* ==========================================================================
+   FORCE PINK AUTOFILL (صورتی کردن کامل فیلدهای اتوفیل)
+   ========================================================================== */
+
+/* برای کروم، اج، سافاری و فایرفاکس جدید */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+input:-autofill,
+input:-autofill:hover,
+input:-autofill:focus {
+  /* لایه صورتی ملایم هم‌رنگ دکمه ورود */
+  -webkit-box-shadow: 0 0 0 1000px #d98895 inset !important;
+  /* رنگ متن روی صورتی (سفید یا بادمجانی تیره) */
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  border-color: #c47381 !important;
+}
+
+/* برای حالت دارک مود (صورتی تیره و ملایم‌تر که چشم رو نزنه) */
+html.dark-mode input:-webkit-autofill,
+html.dark-mode input:-webkit-autofill:hover, 
+html.dark-mode input:-webkit-autofill:focus, 
+html.dark-mode input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #6b2d41 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #8f3f58 !important;
+}
+/* ==========================================================================
+   FIX LOGIN BUTTON & FIREFOX AUTOFILL PINK STYLES
+   ========================================================================== */
+
+/* ۱. صورتی/زرشکی کردن دکمه ورود (Giriş Yap) */
+.login-btn,
+button[type="submit"].login-btn,
+.account-form button[type="submit"] {
+  background: #a86b81 !important; /* رنگ صورتی/رز صورتی تم سایت */
+  background-color: #a86b81 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 20px rgba(168, 107, 129, 0.35) !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-btn:hover,
+button[type="submit"].login-btn:hover,
+.account-form button[type="submit"]:hover {
+  background: #93586d !important;
+  box-shadow: 0 12px 25px rgba(168, 107, 129, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+/* ۲. غلبه کامل بر زردی Autofill در فایرفاکس و کروم (با انیمیشن صورتی) */
+@keyframes autofill-pink {
+  to {
+    background-color: #d98895 !important;
+    color: #ffffff !important;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+input:-moz-ui-autofill,
+input:-moz-ui-autofill-preview {
+  animation-name: autofill-pink !important;
+  animation-fill-mode: both !important;
+  -webkit-box-shadow: 0 0 0 1000px #d98895 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+  border-color: #c47381 !important;
+}
+
+/* برای حالت دارک مود */
+@keyframes autofill-pink-dark {
+  to {
+    background-color: #6b2d41 !important;
+    color: #ffffff !important;
+  }
+}
+
+html.dark-mode input:-webkit-autofill,
+html.dark-mode input:-webkit-autofill:hover, 
+html.dark-mode input:-webkit-autofill:focus,
+html.dark-mode input:-webkit-autofill:active,
+html.dark-mode input:-moz-ui-autofill,
+html.dark-mode input:-moz-ui-autofill-preview {
+  animation-name: autofill-pink-dark !important;
+  animation-fill-mode: both !important;
+  -webkit-box-shadow: 0 0 0 1000px #6b2d41 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+}
+/* ==========================================================================
+   GLASS INPUTS & PINK AUTOFILL FOR LOGIN FORM
+   ========================================================================== */
+
+/* شیشه‌ای کردن تمام فیلدهای داخل فرم ورود */
+.space-y-4 input {
+  width: 100% !important;
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  font-size: 0.9rem !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(168, 107, 129, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  outline: none !important;
+  transition: all 0.25s ease !important;
+}
+
+html.dark-mode .space-y-4 input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+.space-y-4 input:focus {
+  border-color: #a86b81 !important;
+  box-shadow: 0 0 0 3px rgba(168, 107, 129, 0.2) !important;
+}
+
+/* اجبار صورتی شدن اتوفیل مرروگرها */
+.space-y-4 input:-webkit-autofill,
+.space-y-4 input:-webkit-autofill:hover, 
+.space-y-4 input:-webkit-autofill:focus,
+.space-y-4 input:-moz-ui-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #d98895 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+}
+/* ==========================================================================
+   FIREFOX LIGHT MODE AUTOFILL FIX
+   ========================================================================== */
+
+/* اجبار فایرفاکس و کروم در لایت مود به صورتی روشن */
+@keyframes ff-autofill-pink-light {
+  0%, 100% {
+    background-color: #f7d6de !important;
+    color: #6b2138 !important;
+  }
+}
+
+.space-y-4 input:-webkit-autofill,
+.space-y-4 input:-webkit-autofill:hover, 
+.space-y-4 input:-webkit-autofill:focus,
+.space-y-4 input:-moz-ui-autofill,
+.space-y-4 input:-moz-ui-autofill-preview,
+input:-moz-ui-autofill,
+input:-moz-ui-autofill-preview {
+  animation-name: ff-autofill-pink-light !important;
+  animation-fill-mode: both !important;
+  -webkit-box-shadow: 0 0 0 1000px #f7d6de inset !important;
+  -webkit-text-fill-color: #6b2138 !important;
+  color: #6b2138 !important;
+  background-color: #f7d6de !important;
+  border-color: #a86b81 !important;
+}
+
+/* اجبار دارک مود به صورتی/زرشکی تیره */
+@keyframes ff-autofill-pink-dark {
+  0%, 100% {
+    background-color: #6b2d41 !important;
+    color: #ffffff !important;
+  }
+}
+
+html.dark-mode .space-y-4 input:-webkit-autofill,
+html.dark-mode .space-y-4 input:-webkit-autofill:hover, 
+html.dark-mode .space-y-4 input:-webkit-autofill:focus,
+html.dark-mode .space-y-4 input:-moz-ui-autofill,
+html.dark-mode .space-y-4 input:-moz-ui-autofill-preview,
+html.dark-mode input:-moz-ui-autofill {
+  animation-name: ff-autofill-pink-dark !important;
+  animation-fill-mode: both !important;
+  -webkit-box-shadow: 0 0 0 1000px #6b2d41 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+  background-color: #6b2d41 !important;
+}
