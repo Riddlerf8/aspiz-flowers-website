@@ -1,9 +1,10 @@
 # Shop Project (Django + MySQL + Tailwind)
 
-فروشگاه آنلاین یاپای چیچک دپسو — پروژه‌ی کامل با احراز هویت، سبد خرید مبتنی بر دیتابیس،
-قیمت‌گذاری پله‌ای (عمده‌فروشی)، مدیریت موجودی خودکار، اعلان سفارش جدید به واتساپ، و پنل ادمین.
+Yapay Çiçek Depso online store — a complete project featuring authentication, a
+database-backed shopping cart, tiered (wholesale) pricing, automatic inventory
+management, WhatsApp notifications for new orders, and an admin panel.
 
-## راه‌اندازی سریع (ویندوز)
+## Quick Start (Windows)
 
 ```powershell
 python -m venv venv
@@ -11,85 +12,107 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-> نصب MySQL روی ویندوز دیگه دردسر نداره — پروژه از `PyMySQL` (پکیج pure-Python) استفاده
-> می‌کنه به‌جای `mysqlclient`، پس `pip install` بدون نیاز به کامپایلر یا Visual Studio کار می‌کنه.
+> Installing MySQL on Windows is no longer a hassle — the project uses **PyMySQL**
+> (a pure-Python package) instead of `mysqlclient`, so `pip install` works without
+> requiring a compiler or Visual Studio.
 
 ```powershell
-copy .env.example .env            # مقادیرش رو پر کن (SECRET_KEY, DB_*, WHATSAPP_*)
+copy .env.example .env            # fill in the values (SECRET_KEY, DB_*, WHATSAPP_*)
 ```
 
-یه دیتابیس MySQL بساز (با کاراکترست utf8mb4 برای پشتیبانی درست از حروف ترکی/فارسی):
+Create a MySQL database (using the `utf8mb4` character set for proper support of
+Turkish/Persian characters):
 
-اگه هنوز MySQL Server رو نصب نکردی، از [MySQL Installer برای ویندوز](https://dev.mysql.com/downloads/installer/) نصبش کن، یا اگه XAMPP/Laragon داری همون MySQL/MariaDB داخلش کافیه. بعد از نصب، از **MySQL Workbench** یا **Command Prompt** (اگه `mysql` رو به PATH اضافه کرده باشی) این دستور رو بزن:
+If you haven't installed MySQL Server yet, install it via the
+[MySQL Installer for Windows](https://dev.mysql.com/downloads/installer/), or if you
+already have XAMPP/Laragon, the bundled MySQL/MariaDB is sufficient. Once installed,
+run the following command using **MySQL Workbench** or **Command Prompt** (if you've
+added `mysql` to your PATH):
+
 ```sql
 CREATE DATABASE shop_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ```powershell
 npm install
-npm run build:css                 # یا npm run watch:css موقع توسعه
+npm run build:css                 # or npm run watch:css during development
 
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-سپس به آدرس `http://127.0.0.1:8000` برو، و پنل ادمین در `http://127.0.0.1:8000/admin/`.
+Then visit `http://127.0.0.1:8000`, and the admin panel at
+`http://127.0.0.1:8000/admin/`.
 
-## اتصال واتساپ (WhatsApp Business Cloud API)
+## WhatsApp Integration (WhatsApp Business Cloud API)
 
-هر وقت کاربر سفارشش رو تکمیل (checkout) می‌کنه، یه پیام خودکار به شماره واتساپ فروشگاه
-می‌ره که شامل شماره سفارش، اسم مشتری، مبلغ کل، و لینک مستقیم به صفحه‌ی اون سفارش تو ادمینه.
+Whenever a customer completes checkout, an automatic message is sent to the store's
+WhatsApp number containing the order number, customer name, total amount, and a
+direct link to that order's page in the admin panel.
 
-**راه‌اندازی یک‌باره (قبل از اینکه کار کنه، این مراحل رو تو Meta Business Manager انجام بده):**
+**One-time setup (complete these steps in Meta Business Manager before this will work):**
 
-1. یه WhatsApp Business Account و شماره تلفن بساز/تأیید کن: https://business.facebook.com
-2. تو WhatsApp Manager بخش **Message Templates**، یه تمپلیت جدید بساز با اسمی که تو
-   `.env` گذاشتی (پیش‌فرض: `new_order_alert`)، دسته‌ش رو `Utility` بذار، و متن بدنه‌ش
-   این باشه (دقیقاً همینطور، ۴ تا placeholder):
+1. Create/verify a WhatsApp Business Account and phone number: https://business.facebook.com
+2. In WhatsApp Manager, under **Message Templates**, create a new template with the
+   name you set in `.env` (default: `new_order_alert`), set its category to
+   `Utility`, and use the following body text (exactly as shown, with 4 placeholders):
    ```
    New order #{{1}} from {{2}} — total {{3}} TRY. Details: {{4}}
    ```
-   بعد بفرستش برای تأیید متا (معمولاً چند دقیقه تا یک روز طول می‌کشه).
-3. مقادیر زیر رو تو `.env` پر کن:
-   - `WHATSAPP_PHONE_NUMBER_ID` — از صفحه‌ی API Setup اپ متا
-   - `WHATSAPP_ACCESS_TOKEN` — یه **permanent token** بساز (نه توکن موقت ۲۴ساعته)
-   - `WHATSAPP_ADMIN_PHONE` — شماره واتساپی که باید اعلان‌ها رو دریافت کنه، فرمت بین‌المللی بدون `+` (مثلاً `905XXXXXXXXX`)
-   - `SITE_BASE_URL` — دامنه واقعی سایت (برای لینک داخل پیام)
+   Then submit it for Meta approval (this usually takes anywhere from a few minutes
+   to a full day).
+3. Fill in the following values in `.env`:
+   - `WHATSAPP_PHONE_NUMBER_ID` — from the API Setup page of the Meta app
+   - `WHATSAPP_ACCESS_TOKEN` — generate a **permanent token** (not the 24-hour
+     temporary token)
+   - `WHATSAPP_ADMIN_PHONE` — the WhatsApp number that should receive notifications,
+     in international format without a `+` (e.g., `905XXXXXXXXX`)
+   - `SITE_BASE_URL` — the site's real domain (used for the link inside the message)
 
-اگه ارسال پیام به هر دلیلی fail بشه (توکن اشتباه، تمپلیت هنوز تأیید نشده، قطعی شبکه...)،
-**سفارش همچنان با موفقیت ثبت میشه** — فقط تو پنل ادمین ستون "Whatsapp notified" روی سفارش
-`False` می‌مونه، و می‌تونی از اکشن **"Resend WhatsApp notification"** تو لیست سفارش‌ها
-دوباره امتحانش کنی.
+If sending the message fails for any reason (invalid token, template not yet
+approved, network outage, etc.), **the order is still placed successfully** — only
+the "Whatsapp notified" column for that order remains `False` in the admin panel,
+and you can retry it at any time using the **"Resend WhatsApp notification"** action
+in the order list.
 
-## چیزی که تکمیل شده
+## What's Completed
 
-- **accounts** — مدل کاربر سفارشی (phone/address)، ثبت‌نام، ورود، خروج، پروفایل
-- **products** — لیست، دسته‌بندی، جزئیات محصول، جست‌وجو، صفحه‌بندی
-- **cart** — سبد خرید مبتنی بر دیتابیس (برای کاربر لاگین‌کرده و مهمان)، ادغام خودکار سبد مهمان هنگام لاگین، قیمت پله‌ای خودکار بر اساس تعداد
-- **orders** — تسویه‌حساب، تاریخچه سفارش، لغو سفارش (با بازگردانی خودکار موجودی)، **اعلان خودکار سفارش جدید به واتساپ**
-- کسر/بازگردانی موجودی با قفل ردیف (`select_for_update`) برای جلوگیری از overselling در سفارش‌های همزمان
-- تمپلیت‌های Tailwind ریسپانسیو (هدر، فوتر، کارت محصول و ...)
+- **accounts** — custom user model (phone/address), registration, login, logout,
+  profile
+- **products** — listing, categories, product details, search, pagination
+- **cart** — database-backed shopping cart (for both logged-in and guest users),
+  automatic guest-cart merging on login, automatic tiered pricing based on quantity
+- **orders** — checkout, order history, order cancellation (with automatic
+  inventory restoration), **automatic WhatsApp notification for new orders**
+- Inventory deduction/restoration using row locking (`select_for_update`) to
+  prevent overselling on concurrent orders
+- Responsive Tailwind templates (header, footer, product cards, etc.)
 
-## نکات فنی مهم
+## Important Technical Notes
 
-- `AUTH_USER_MODEL = "accounts.User"` — قبل از اولین migrate تنظیم شده (تغییرش بعداً سخته)
-- سبد خرید هم برای کاربر مهمان (session-based) کار می‌کنه هم کاربر لاگین‌کرده؛ هنگام لاگین سبدها merge می‌شن
-- زبان سایت (متن‌های مشتری‌محور، وضعیت سفارش و...) **ترکی**ه؛ پنل ادمین `/admin/` به‌طور جداگانه
-  همیشه **انگلیسی** نمایش داده می‌شه (`config/middleware.py: AdminLanguageMiddleware`)، صرف‌نظر از
-  `LANGUAGE_CODE` کلی سایت. توجه: چندتا choice-label مشترک بین ادمین و مشتری (مثل وضعیت سفارش:
-  "Kargoda" و بج‌های محصول) عمداً ترکی موندن چون همون‌جا رو مشتری هم می‌بینه.
-- برای production حتماً `DEBUG=False`، `SECRET_KEY` تصادفی و طولانی تنظیم کن — با `DEBUG=False`،
-  تنظیمات امنیتی (`SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, HSTS) خودکار فعال میشن.
+- `AUTH_USER_MODEL = "accounts.User"` — set before the first migration (difficult
+  to change later)
+- The shopping cart works for both guest users (session-based) and logged-in
+  users; carts are merged automatically on login
+- The site language (customer-facing text, order status, etc.) is **Turkish**; the
+  admin panel at `/admin/` is always displayed in **English** independently
+  (`config/middleware.py: AdminLanguageMiddleware`), regardless of the overall
+  `LANGUAGE_CODE` setting. Note: a few choice labels shared between the admin panel
+  and customer-facing pages (such as order status "Kargoda" and product badges)
+  were intentionally left in Turkish, since customers see that same field.
+- For production, be sure to set `DEBUG=False` and a long, randomly generated
+  `SECRET_KEY` — with `DEBUG=False`, security settings (`SECURE_SSL_REDIRECT`,
+  `SESSION_COOKIE_SECURE`, HSTS) are enabled automatically.
 
-## تغییرات این نسخه (Changelog)
+## Changelog
 
-| # | تغییر | چرا |
+| # | Change | Reason |
 |---|---|---|
-| 1 | دیتابیس از PostgreSQL به **MySQL** تغییر کرد؛ با **PyMySQL** (نه mysqlclient) تا رو ویندوز بدون کامپایلر نصب بشه | درخواست صریح پروژه + سیستم‌عامل ویندوز |
-| 2 | اتصال کامل **WhatsApp Business Cloud API** به فرآیند checkout | مهم‌ترین قابلیت پروژه، قبلاً اصلاً وجود نداشت |
-| 3 | فیلد `whatsapp_notified` + اکشن "Resend WhatsApp notification" تو ادمین | تا اگه ارسال پیام fail شد، سفارش گم نشه |
-| 4 | پنل ادمین انگلیسی، سایت مشتری ترکی (`AdminLanguageMiddleware`) | درخواست صریح |
-| 5 | دکمه‌ی "علاقه‌مندی‌ها" (wishlist) حذف شد | دکمه بدون بک‌اند/جاوااسکریپت بود؛ کلیک هیچ اتفاقی نمی‌انداخت |
-| 6 | context processor سبد خرید دیگه برای هر بازدید ناشناس، ردیف Cart/Session نمی‌سازه | جلوگیری از رشد بی‌مورد دیتابیس با ترافیک بالا |
-| 7 | تنظیمات امنیتی production (`SECURE_SSL_REDIRECT` و...) وقتی `DEBUG=False` است | آماده‌سازی برای انتشار واقعی |
+| 1 | Database switched from PostgreSQL to **MySQL**, using **PyMySQL** (not `mysqlclient`) so it installs on Windows without a compiler | Explicit project requirement + Windows OS |
+| 2 | Full **WhatsApp Business Cloud API** integration added to the checkout flow | The project's most important feature, previously nonexistent |
+| 3 | Added `whatsapp_notified` field + "Resend WhatsApp notification" admin action | So an order isn't lost if message sending fails |
+| 4 | Admin panel in English, customer-facing site in Turkish (`AdminLanguageMiddleware`) | Explicit requirement |
+| 5 | Removed the "Wishlist" button | The button had no backend/JavaScript behind it; clicking it did nothing |
+| 6 | The cart context processor no longer creates a Cart/Session row for every anonymous visit | Prevents unnecessary database growth under high traffic |
+| 7 | Production security settings (`SECURE_SSL_REDIRECT`, etc.) enabled when `DEBUG=False` | Preparation for a real production launch |
