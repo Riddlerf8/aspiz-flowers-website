@@ -7,9 +7,6 @@
   <meta name="theme-color" content="#12080c">
   <meta name="color-scheme" content="light dark">
   <title>{% block title %}Yapay Çiçek Deposu{% endblock %}</title>
-
-  <!-- Tema flaşını (yanlış renkte açılıp sonra değişmesini) önlemek için
-       localStorage'daki tercih CSS/JS yüklenmeden ÖNCE uygulanıyor. -->
   <script>
     (function () {
       var saved = localStorage.getItem("theme");
@@ -22,16 +19,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Site-wide görsel dil (referans tasarımdan): renkler, dark mode, header/footer -->
   <link rel="stylesheet" href="{% static 'vendor/css/site.css' %}">
-  <!-- Tailwind: ürün grid/kart/form gibi iç sayfa bileşenleri için, sonraki aşamada
-       kademeli olarak site.css'e taşınacak -->
+ 
   <link rel="stylesheet" href="{% static 'src/output.css' %}">
 
   <style>
-    /* site.css bir sticky-footer kuralı vermiyor; Tailwind'in body sınıflarını
-       (renk çakışmasını önlemek için) kaldırdığımızdan burada minimal olarak ekliyoruz */
+
     body { min-height: 100vh; display: flex; flex-direction: column; }
     main { flex: 1; }
   </style>
@@ -65,7 +58,7 @@
   {% include "components/footer.html" %}
 
   <script>
-    // CSRF-aware helper for the AJAX "add to cart" buttons on product cards.
+   
     function getCookie(name) {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       return match ? decodeURIComponent(match[2]) : null;

@@ -1,5 +1,5 @@
-<!-- TODO: gerçek adres/telefon/e-posta bilgilerinizi girin -->
-<footer class="site-footer glass-footer">
+
+<footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
@@ -11,16 +11,11 @@
           </div>
         </a>
         <p class="footer-desc">Kaliteli ve dekoratif yapay çiçekler, toptan ve perakende.</p>
-        <ul class="footer-contact">
-          <li>
-            <span class="footer-icon-box"><i class="fa-solid fa-location-dot"></i></span>
-            <span>[Mağaza / depo adresinizi buraya yazın]</span>
-          </li>
-          <li>
-            <span class="footer-icon-box"><i class="fa-brands fa-whatsapp"></i></span>
-            <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}">{{ shop_whatsapp_display }}</a>
-          </li>
-        </ul>
+        <div class="footer-bottom-right">
+          <a href="#" class="footer-social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="footer-social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="footer-social-btn" aria-label="Youtube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
       </div>
 
       <div class="footer-col">
@@ -44,15 +39,33 @@
           {% endfor %}
         </ul>
       </div>
+
+      <div class="footer-col">
+        <h3 class="footer-col-title">İletişim</h3>
+        <ul class="footer-contact">
+          <li>
+            <span class="footer-icon-box"><i class="fa-solid fa-location-dot"></i></span>
+            <span>[Mağaza / depo adresinizi buraya yazın]</span>
+          </li>
+          <li>
+            <span class="footer-icon-box"><i class="fa-brands fa-whatsapp"></i></span>
+            <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}">{{ shop_whatsapp_display }}</a>
+          </li>
+        </ul>
+
+        <form class="footer-search" action="{% url 'products:list' %}" method="get">
+          <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Ürün ara..." autocomplete="off">
+          <button type="submit" aria-label="Ara">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
   <div class="container">
     <div class="footer-bottom">
       <p class="footer-copyright">&copy; {% now "Y" %} Yapay Çiçek Deposu &middot; Tüm hakları saklıdır.</p>
-      <div class="footer-bottom-right">
-        <a href="#" class="footer-social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-      </div>
     </div>
   </div>
 </footer>

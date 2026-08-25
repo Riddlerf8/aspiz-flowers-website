@@ -38,10 +38,6 @@
           </button>
         </div>
 
-        <!-- Giriş formu: auth-modal.js bunu fetch ile accounts:login'e POST
-             eder ve JSON cevap bekler (bkz. apps/accounts/views.py). Başarılıysa
-             modal'dan hiç çıkmadan sayfa aynı yerde yenilenir (next=request.path);
-             hatalıysa hata mesajları modal içinde, sayfa hiç değişmeden gösterilir. -->
         <div class="auth-panel active" data-auth-panel="login" id="authPanelLogin"
           role="tabpanel" aria-labelledby="authTabLogin">
           <h1 id="authModalTitle">Hoş Geldiniz</h1>
@@ -103,10 +99,6 @@
           </div>
         </div>
 
-        <!-- Kayıt formu: auth-modal.js bunu fetch ile accounts:register'a POST
-             eder ve JSON cevap bekler. Alan adları apps/accounts/forms.py ->
-             RegisterForm ile birebir eşleşiyor: full_name, email, password1,
-             password2, terms. Kullanıcı adı e-postadan otomatik üretilir. -->
         <div class="auth-panel" data-auth-panel="register" id="authPanelRegister"
           role="tabpanel" aria-labelledby="authTabRegister" hidden>
           <h1>Hemen Kaydolun</h1>

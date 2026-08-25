@@ -603,8 +603,7 @@ html.dark-mode .moon-icon { display: none; }
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.45);
   z-index: var(--z-overlay);
   opacity: 0;
   pointer-events: none;
@@ -619,20 +618,28 @@ html.dark-mode .moon-icon { display: none; }
 .mobile-sidebar {
   position: fixed;
   top: 0;
-  left: -320px;
+  left: 0;
   width: 310px;
   height: 100vh;
-  background-color: var(--bg-main);
-  border-right: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
   z-index: var(--z-sidebar);
   display: flex;
   flex-direction: column;
-  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-lg);
 }
 
+html.dark-mode .mobile-sidebar {
+  background: rgba(38, 14, 23, 0.55);
+  border-right: 1px solid rgba(209, 130, 158, 0.2);
+}
+
 .mobile-sidebar.active {
-  left: 0;
+  transform: translateX(0);
 }
 
 .sidebar-header {
@@ -792,7 +799,11 @@ html.dark-mode .moon-icon { display: none; }
 .sidebar-footer {
   padding: 20px;
   border-top: 1px solid var(--border-color);
-  background-color: var(--bg-card);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+html.dark-mode .sidebar-footer {
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .instagram-link {
@@ -937,31 +948,67 @@ html.dark-mode .glass-floating-oval .search-box {
     max-width: 540px;
   }
 
+  .top-info-bar {
+    display: none;
+  }
+
   .top-banner {
-    min-height: 46vh;
+    min-height: 32vh;
+    max-height: 280px;
+  }
+
+  .top-banner-content {
+    padding: 24px 16px;
   }
 
   .top-banner-eyebrow {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .top-banner h2 {
+    font-size: clamp(1.25rem, 5.5vw, 1.75rem);
+  }
+
+  .main-header-wrapper {
+    top: 12px;
+  }
+
+  .main-header.glass-floating-oval {
+    padding: 8px 16px;
+    border-radius: 40px;
   }
 
   .main-header .container {
     flex-wrap: wrap;
+    gap: 10px;
   }
 
   .logo-area {
     order: 1;
+    font-size: 1rem;
   }
 
   .header-actions {
     order: 2;
+    gap: 8px;
   }
 
   .search-box {
     order: 3;
     flex: 1 0 100%;
-    margin-top: 10px;
+    margin-top: 6px;
+    padding: 2px 14px;
+  }
+
+  .search-box input {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .category-slider {
+    padding: 12px 0;
   }
 
   .cat-item {
@@ -993,17 +1040,23 @@ html.dark-mode .glass-floating-oval .search-box {
     width: 85%;
   }
 
+  .top-banner {
+    min-height: 26vh;
+    max-height: 220px;
+  }
+
   .logo-area {
-    font-size: 1rem;
+    font-size: 0.9375rem;
   }
 
   .header-actions {
-    gap: 8px;
+    gap: 6px;
   }
 
   .icon-action-btn {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
   }
 
   .search-box input {
@@ -1742,17 +1795,20 @@ html.dark-mode .form-group input[type="text"] {
    8. FOOTER & NOTIFICATIONS
    ========================================================================== */
 .site-footer {
-  background-color: var(--bg-nav);
+  background: linear-gradient(135deg, var(--accent-plum) 0%, var(--bg-nav) 100%);
   color: var(--text-nav);
-  padding-top: 4rem;
-  margin-top: 4rem;
+  padding-top: 3rem;
+  margin: 3rem 1.25rem 1.5rem;
+  border-radius: 32px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr 1fr 1.1fr;
   gap: 2.5rem;
-  padding-bottom: 3rem;
+  padding: 0 2.5rem 3rem;
 }
 
 .footer-logo {
@@ -1884,13 +1940,58 @@ html[dir="rtl"] .footer-links a:hover {
   transform: translateX(-4px);
 }
 
+.footer-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-pill);
+  padding: 4px 4px 4px 16px;
+  margin-top: 0.5rem;
+  max-width: 240px;
+}
+
+.footer-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.footer-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.footer-search button {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-circle);
+  border: none;
+  background-color: var(--accent-rose);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.footer-search button:hover {
+  background-color: #fff;
+  color: var(--accent-plum);
+}
+
 .footer-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem 2.5rem;
   border-top: 1px solid rgba(245, 234, 238, 0.12);
   font-size: 0.8125rem;
 }
@@ -1949,15 +2050,19 @@ html[dir="rtl"] .footer-links a:hover {
 
 @media screen and (max-width: 576px) {
   .site-footer {
-    padding-top: 3rem;
+    padding-top: 2.5rem;
+    margin: 1.5rem 0.75rem 1rem;
+    border-radius: 24px;
   }
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
+    padding: 0 1.5rem 2.5rem;
   }
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
+    padding: 1.5rem;
   }
 }
 
@@ -2364,9 +2469,13 @@ html[dir="rtl"] .footer-links a:hover {
   width: 100%;
   padding: 0;
   color: inherit;
+  transition: var(--transition);
 }
 
-.sidebar-links .sidebar-link-btn:hover { color: var(--accent-rose); }
+.sidebar-links .sidebar-link-btn:hover {
+  color: var(--accent-rose);
+  padding-left: 5px;
+}
 
 .cart-loading-state {
   display: none;
@@ -2379,7 +2488,7 @@ html[dir="rtl"] .footer-links a:hover {
 
 .cart-loading-state.active { display: flex; }
 /* ==========================================================================
-   GLASSMORPHISM ACCOUNT & PROFILE PAGE (طرح شیشه‌ای برای کد جنگوی منصور)
+   GLASSMORPHISM ACCOUNT & PROFILE PAGE 
    ========================================================================== */
 
 .account-page {
@@ -2387,7 +2496,6 @@ html[dir="rtl"] .footer-links a:hover {
   width: 100%;
 }
 
-/* شبکه دو کارت اصلی */
 .account-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2395,13 +2503,13 @@ html[dir="rtl"] .footer-links a:hover {
   align-items: start;
 }
 
-/* کارت‌های شیشه‌ای (Profil Bilgileri & Son Siparişlerim) */
+
 .account-card {
   position: relative;
   padding: 2rem;
   border-radius: 20px;
   
-  /* افکت شیشه‌ای (Glassmorphism) برای لایت مود */
+ 
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -2410,14 +2518,14 @@ html[dir="rtl"] .footer-links a:hover {
   transition: all 0.3s ease;
 }
 
-/* افکت شیشه‌ای برای دارک مود */
+
 html.dark-mode .account-card {
   background: rgba(30, 15, 22, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
 }
 
-/* هدر کارت‌ها */
+
 .account-card-header {
   display: flex;
   align-items: center;
@@ -2453,7 +2561,6 @@ html.dark-mode .account-card {
   color: var(--text-muted, #717171);
 }
 
-/* فرم و گروه‌ها */
 .account-form {
   display: flex;
   flex-direction: column;
@@ -2478,7 +2585,6 @@ html.dark-mode .account-card {
   color: var(--text-main, #2b2b2b);
 }
 
-/* ورودی‌های شیشه‌ای جنگو (Input, Textarea, Select) */
 .input-with-icon {
   position: relative;
   display: flex;
@@ -2502,7 +2608,6 @@ html.dark-mode .account-card {
   z-index: 2;
 }
 
-/* استایل دادن به فیلدهای خود جنگو که رندر می‌شن */
 .input-with-icon input,
 .input-with-icon textarea,
 .input-with-icon select {
@@ -2543,14 +2648,12 @@ html.dark-mode .input-with-icon select:focus {
   box-shadow: 0 0 0 4px rgba(168, 107, 129, 0.25);
 }
 
-/* پیام‌های خطا */
 .error-message {
   color: #e53e3e;
   font-size: 0.8rem;
   margin-top: 2px;
 }
 
-/* دکمه Kaydet (ذخیره) */
 .login-btn {
   display: inline-flex;
   align-items: center;
@@ -2575,7 +2678,6 @@ html.dark-mode .input-with-icon select:focus {
   filter: brightness(1.1);
 }
 
-/* لیست سفارشات (Son Siparişlerim) */
 .order-list {
   display: flex;
   flex-direction: column;
@@ -2641,7 +2743,6 @@ html.dark-mode .order-row:hover {
   gap: 12px;
 }
 
-/* ریسپانسیو برای موبایل */
 @media screen and (max-width: 868px) {
   .account-grid {
     grid-template-columns: 1fr;
@@ -2651,11 +2752,7 @@ html.dark-mode .order-row:hover {
     grid-template-columns: 1fr;
   }
 }
-/* ==========================================================================
-   FORCE PINK AUTOFILL (صورتی کردن کامل فیلدهای اتوفیل)
-   ========================================================================== */
 
-/* برای کروم، اج، سافاری و فایرفاکس جدید */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
@@ -2663,15 +2760,15 @@ input:-webkit-autofill:active,
 input:-autofill,
 input:-autofill:hover,
 input:-autofill:focus {
-  /* لایه صورتی ملایم هم‌رنگ دکمه ورود */
+
   -webkit-box-shadow: 0 0 0 1000px #d98895 inset !important;
-  /* رنگ متن روی صورتی (سفید یا بادمجانی تیره) */
+
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff !important;
   border-color: #c47381 !important;
 }
 
-/* برای حالت دارک مود (صورتی تیره و ملایم‌تر که چشم رو نزنه) */
+
 html.dark-mode input:-webkit-autofill,
 html.dark-mode input:-webkit-autofill:hover, 
 html.dark-mode input:-webkit-autofill:focus, 
@@ -2684,11 +2781,10 @@ html.dark-mode input:-webkit-autofill:active {
    FIX LOGIN BUTTON & FIREFOX AUTOFILL PINK STYLES
    ========================================================================== */
 
-/* ۱. صورتی/زرشکی کردن دکمه ورود (Giriş Yap) */
 .login-btn,
 button[type="submit"].login-btn,
 .account-form button[type="submit"] {
-  background: #a86b81 !important; /* رنگ صورتی/رز صورتی تم سایت */
+  background: #a86b81 !important; 
   background-color: #a86b81 !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -2704,7 +2800,7 @@ button[type="submit"].login-btn:hover,
   transform: translateY(-2px);
 }
 
-/* ۲. غلبه کامل بر زردی Autofill در فایرفاکس و کروم (با انیمیشن صورتی) */
+
 @keyframes autofill-pink {
   to {
     background-color: #d98895 !important;
@@ -2726,7 +2822,7 @@ input:-moz-ui-autofill-preview {
   border-color: #c47381 !important;
 }
 
-/* برای حالت دارک مود */
+
 @keyframes autofill-pink-dark {
   to {
     background-color: #6b2d41 !important;
@@ -2750,7 +2846,7 @@ html.dark-mode input:-moz-ui-autofill-preview {
    GLASS INPUTS & PINK AUTOFILL FOR LOGIN FORM
    ========================================================================== */
 
-/* شیشه‌ای کردن تمام فیلدهای داخل فرم ورود */
+
 .space-y-4 input {
   width: 100% !important;
   padding: 10px 14px !important;
@@ -2774,7 +2870,7 @@ html.dark-mode .space-y-4 input {
   box-shadow: 0 0 0 3px rgba(168, 107, 129, 0.2) !important;
 }
 
-/* اجبار صورتی شدن اتوفیل مرروگرها */
+
 .space-y-4 input:-webkit-autofill,
 .space-y-4 input:-webkit-autofill:hover, 
 .space-y-4 input:-webkit-autofill:focus,
@@ -2787,7 +2883,7 @@ html.dark-mode .space-y-4 input {
    FIREFOX LIGHT MODE AUTOFILL FIX
    ========================================================================== */
 
-/* اجبار فایرفاکس و کروم در لایت مود به صورتی روشن */
+
 @keyframes ff-autofill-pink-light {
   0%, 100% {
     background-color: #f7d6de !important;
@@ -2811,7 +2907,7 @@ input:-moz-ui-autofill-preview {
   border-color: #a86b81 !important;
 }
 
-/* اجبار دارک مود به صورتی/زرشکی تیره */
+
 @keyframes ff-autofill-pink-dark {
   0%, 100% {
     background-color: #6b2d41 !important;

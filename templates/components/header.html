@@ -1,8 +1,6 @@
 {% load static %}
-
 <div class="preloader" data-preloader></div>
 <div class="overlay" data-overlay data-nav-toggler></div>
-
 <header class="header-complex" data-header>
   <!-- 1. Top Banner (Video Hero) -->
   <div class="top-banner">
@@ -15,13 +13,10 @@
       <h2>Türkiye'nin En Büyük Çiçek Deposu</h2>
     </div>
   </div>
-
-  <!-- ۱. Top Info Bar -->
-  <!-- ۱. Top Info Bar -->
   <div class="top-info-bar">
     <div class="container">
       <div class="top-info-left">
-        <!-- اگه چیز دیگه‌ای مثل ایمیل یا پیام خوش‌آمدگویی داری اینجا بذار -->
+       
       </div>
       <div class="top-info-right">
         <i class="fa-brands fa-whatsapp"></i> {{ shop_whatsapp_display }}
@@ -29,17 +24,13 @@
     </div>
   </div>
 
-  <!-- ۲. Main Header شناور و شیشه‌ای -->
+ 
   <div class="main-header-wrapper">
     <div class="main-header glass-floating-oval">
       <div class="container header-content">
-
-        <!-- لوگو -->
         <a href="{% url 'core:home' %}" class="logo-area">
-          <i class="fa-solid fa-leaf"></i> ÇİÇEK
+          <i class="fa-solid fa-leaf"></i> Aspiz flowers
         </a>
-
-        <!-- سرچ باکس -->
         <form class="search-box" action="{% url 'products:list' %}" method="get" data-search-container
           autocomplete="off">
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -49,8 +40,6 @@
 
           <div class="search-results" data-search-results></div>
         </form>
-
-        <!-- دکمه‌ها و اکشن‌ها -->
         <div class="header-actions">
           <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button" aria-label="Temayı değiştir">
             <i class="fa-solid fa-moon moon-icon"></i>
@@ -151,8 +140,6 @@
       <p class="copyright-text">&copy; {% now "Y" %} Yapay Çiçek Deposu</p>
     </div>
   </nav>
-
-  <!-- ۴. Main Nav (دسته بندی‌ها) -->
   {% if nav_categories %}
   <nav class="main-nav">
     <div class="container">
@@ -165,7 +152,7 @@
   </nav>
   {% endif %}
 
-  <!-- ۵. Popular products circular slider -->
+  <!--  Popular products circular slider -->
   {% if featured_products %}
   <div class="category-slider">
     <div class="container">
