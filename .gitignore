@@ -1,1 +1,12 @@
 
+.env
+venv/
+__pycache__/
+*.pyc
+media/
+node_modules/
+db.sqlite3
+staticfiles/
+static/src/output.css
+.vscode/
+*.log
