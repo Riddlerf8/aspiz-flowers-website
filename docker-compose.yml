@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cicek_db
+    environment:
+      MYSQL_DATABASE: shop_db
+      MYSQL_USER: shopuser
+      MYSQL_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: cicek_web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8001:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,web}
+      - ADMIN_URL=${ADMIN_URL:-admin/}
+      - BEHIND_PROXY=${BEHIND_PROXY:-True}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - DB_NAME=${DB_NAME:-shop_db}
+      - DB_USER=shopuser
+      - DB_PASSWORD=${DB_PASSWORD:-rootpassword}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - WHATSAPP_API_VERSION=${WHATSAPP_API_VERSION}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+      - WHATSAPP_ADMIN_PHONE=${WHATSAPP_ADMIN_PHONE}
+      - WHATSAPP_ORDER_TEMPLATE_NAME=${WHATSAPP_ORDER_TEMPLATE_NAME}
+      - WHATSAPP_TEMPLATE_LANGUAGE=${WHATSAPP_TEMPLATE_LANGUAGE}
+      - SITE_BASE_URL=${SITE_BASE_URL}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  db_data:
+  static_volume:
+  media_volume:
