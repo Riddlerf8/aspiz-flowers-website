@@ -7,11 +7,25 @@
   .thumb-active { border-color: #7d2140; box-shadow: 0 0 0 1px #7d2140; }
   .tier-box.tier-active {
     border-color: var(--accent-gold, #b8925a);
-    background-color: var(--bg-main, #fcf8f9);
+    background-color: var(--bg-card, #f3e9ec);
   }
   .tier-box.tier-active .tier-price { color: var(--accent-plum, #6d1a35); }
   .accordion-panel { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
   .accordion-icon { transition: transform .2s ease; }
+  .luxe-cta {
+    background-image: linear-gradient(110deg, #3c0c1c 0%, #7d2140 45%, #4a0f24 100%);
+    background-size: 200% auto;
+    background-position: left center;
+    border: 1px solid rgba(201, 167, 104, 0.55);
+    box-shadow: 0 8px 22px -8px rgba(74, 15, 36, 0.55);
+    transition: background-position .5s ease, box-shadow .3s ease, transform .3s ease, border-color .3s ease;
+  }
+  .luxe-cta:hover:not(:disabled) {
+    background-position: right center;
+    border-color: rgba(227, 204, 148, 0.9);
+    box-shadow: 0 12px 30px -8px rgba(140, 42, 75, 0.65);
+    transform: translateY(-1px);
+  }
 </style>
 {% endblock %}
 
@@ -110,10 +124,11 @@
         <input type="number" name="quantity" data-qty-input
                value="{{ product.highest_priced_tier.min_quantity|default:1 }}" min="1"
                max="{{ product.stock_quantity }}" {% if product.is_sold_out %}disabled{% endif %}
-               class="w-24 rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm">
+               class="w-24 rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm
+                      focus:outline-none focus:ring-1 focus:ring-[#c9a768] focus:border-[#c9a768]">
         <button type="submit" {% if product.is_sold_out %}disabled{% endif %}
-                class="flex-1 rounded-pill py-3 font-medium uppercase tracking-wide text-[13px] text-white transition flex items-center justify-center gap-2
-                       {% if product.is_sold_out %}bg-wine-100 dark:bg-white/10 text-wine-300 dark:text-[#8a7355] cursor-not-allowed{% else %}bg-wine-800 hover:bg-wine-900{% endif %}">
+                class="flex-1 rounded-pill py-3.5 font-semibold text-[12.5px] tracking-[0.14em] uppercase transition-all duration-300 flex items-center justify-center gap-2
+                       {% if product.is_sold_out %}bg-wine-100 dark:bg-white/10 text-wine-300 dark:text-[#8a7355] cursor-not-allowed{% else %}luxe-cta text-[#f6ecd4]{% endif %}">
           <i class="fa-solid fa-cart-shopping"></i>
           {% if product.is_sold_out %}Tükendi{% else %}Sepete Ekle{% endif %}
         </button>

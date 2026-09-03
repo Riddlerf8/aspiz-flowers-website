@@ -5,7 +5,7 @@
     <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6 text-center">Kayıt Ol</h1>
     <form method="post" class="space-y-4">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.GET.next|default:request.POST.next }}">
+      <input type="hidden" name="next" value="{{ next|default:'' }}">
       {% for field in form %}
         <div>
           <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
