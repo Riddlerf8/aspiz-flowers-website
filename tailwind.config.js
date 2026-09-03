@@ -34,6 +34,7 @@ module.exports = {
       fontFamily: {
         serif: ["'Playfair Display'", "serif"],
         sans: ["'Inter'", "sans-serif"],
+        display: ["'Bebas Neue'", "'Inter'", "sans-serif"],
       },
       borderRadius: {
         pill: "999px",

@@ -1,68 +1,47 @@
 {% load static %}
+{% load i18n %}
 <div class="preloader" data-preloader></div>
 <div class="overlay" data-overlay data-nav-toggler></div>
 <header class="header-complex" data-header>
-  <!-- 1. Top Banner (Video Hero) -->
-  <div class="top-banner">
-    <video class="top-banner-media" autoplay muted loop playsinline preload="auto">
-      <source src="{% static 'vendor/video/hero-banner.mp4' %}" type="video/mp4">
-    </video>
-    <div class="top-banner-overlay"></div>
-    <div class="container top-banner-content">
-      <span class="top-banner-eyebrow">En özel ürünlerle</span>
-      <h2>Türkiye'nin En Büyük Çiçek Deposu</h2>
-    </div>
-  </div>
-  <div class="top-info-bar">
-    <div class="container">
-      <div class="top-info-left">
-       
-      </div>
-      <div class="top-info-right">
-        <i class="fa-brands fa-whatsapp"></i> {{ shop_whatsapp_display }}
-      </div>
-    </div>
-  </div>
-
- 
   <div class="main-header-wrapper">
     <div class="main-header glass-floating-oval">
       <div class="container header-content">
         <a href="{% url 'core:home' %}" class="logo-area">
           <i class="fa-solid fa-leaf"></i> Aspiz flowers
         </a>
-        <form class="search-box" action="{% url 'products:list' %}" method="get" data-search-container
-          autocomplete="off">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" name="q" value="{{ request.GET.q }}" data-search-input
-            placeholder="Aradığınız ürünün adını yazınız..." autocomplete="off">
-          <button type="submit" data-search-submit>ARA</button>
 
-          <div class="search-results" data-search-results></div>
-        </form>
+        <nav class="header-nav-links">
+          <a href="{% url 'core:home' %}">{% trans "Anasayfa" %}</a>
+          <a href="{% url 'products:list' %}">{% trans "Tüm Ürünler" %}</a>
+          {% if user.is_authenticated %}
+          <a href="{% url 'orders:history' %}">{% trans "Siparişlerim" %}</a>
+          {% endif %}
+        </nav>
+
+
         <div class="header-actions">
-          <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button" aria-label="Temayı değiştir">
+          <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button" aria-label="{% trans 'Temayı değiştir' %}">
             <i class="fa-solid fa-moon moon-icon"></i>
             <i class="fa-solid fa-sun sun-icon"></i>
           </button>
 
           {% if user.is_authenticated %}
-          <a href="{% url 'accounts:profile' %}" class="icon-action-btn" aria-label="Hesabım">
+          <a href="{% url 'accounts:profile' %}" class="icon-action-btn" aria-label="{% trans 'Hesabım' %}">
             <i class="fa-regular fa-user"></i>
           </a>
           {% else %}
-          <button type="button" class="icon-action-btn" data-login-open="login" aria-label="Giriş Yap">
+          <button type="button" class="icon-action-btn" data-login-open="login" aria-label="{% trans 'Giriş Yap' %}">
             <i class="fa-regular fa-user"></i>
           </button>
           {% endif %}
 
           <a href="{% url 'cart:detail' %}" class="icon-action-btn cart-btn" data-cart-open
-            aria-label="Sepetim, {{ cart_item_count|default:0 }} ürün">
+            aria-label="{% blocktrans count counter=cart_item_count|default:0 %}Sepetim, {{ counter }} ürün{% plural %}Sepetim, {{ counter }} ürün{% endblocktrans %}">
             <i class="fa-solid fa-cart-shopping"></i>
             <span class="cart-count" data-cart-count>{{ cart_item_count|default:0 }}</span>
           </a>
 
-          <button class="nav-open-btn" type="button" aria-label="open menu" data-nav-toggler>
+          <button class="nav-open-btn" type="button" aria-label="{% trans 'open menu' %}" data-nav-toggler>
             <i class="fa-solid fa-bars"></i>
           </button>
         </div>
@@ -70,6 +49,36 @@
       </div>
     </div>
   </div>
+
+  <!-- 2. Top Banner (Video Hero) — homepage only: keeps inner pages light & fast on mobile.
+       Sits below the header now, so it never overlaps the nav bar above it. -->
+  {% if request.resolver_match.view_name == 'core:home' %}
+  <div class="top-banner">
+    <video class="top-banner-media" autoplay muted loop playsinline preload="auto">
+      <source src="{% static 'vendor/video/hero-banner.mp4' %}" type="video/mp4">
+    </video>
+    <div class="top-banner-overlay"></div>
+    <div class="container top-banner-content">
+      <span class="top-banner-eyebrow">{% trans "En özel ürünlerle" %}</span>
+      <h2>{% trans "Türkiye'nin En Büyük Çiçek Deposu" %}</h2>
+
+      <div class="top-banner-actions">
+        <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}" target="_blank" rel="noopener noreferrer" class="hero-btn hero-btn-filled">
+          <i class="fa-brands fa-whatsapp"></i> {% trans "Sipariş Ver" %}
+        </a>
+        <a href="{% url 'products:list' %}" class="hero-btn hero-btn-filled">
+          <i class="fa-solid fa-leaf"></i> {% trans "Ürünleri Keşfet" %}
+        </a>
+      </div>
+
+      <div class="top-banner-trust">
+        <span><i class="fa-solid fa-gem"></i> {% trans "Kaliteli Ürünler" %}</span>
+        <span><i class="fa-solid fa-truck-fast"></i> {% trans "Hızlı Teslimat" %}</span>
+        <span><i class="fa-solid fa-heart"></i> {% trans "Özenle Hazırlanır" %}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   <!-- ۳. Mobile Sidebar -->
   <nav class="mobile-sidebar" data-navbar>
@@ -81,29 +90,39 @@
           <span class="brand-sub">DEPOSU</span>
         </div>
       </a>
-      <button class="nav-close-btn" type="button" aria-label="close menu" data-nav-toggler>
+      <button class="nav-close-btn" type="button" aria-label="{% trans 'close menu' %}" data-nav-toggler>
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
     <div class="sidebar-content">
+      <form class="sidebar-search" action="{% url 'products:list' %}" method="get" data-search-container autocomplete="off">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" name="q" value="{{ request.GET.q }}" data-search-input
+          placeholder="{% trans 'Aradığınız ürünün adını yazınız...' %}" autocomplete="off">
+        <button type="submit" data-search-submit aria-label="{% trans 'Ara' %}">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div class="search-results" data-search-results></div>
+      </form>
+
       <div class="sidebar-section">
-        <h3 class="section-title">KURUMSAL</h3>
+        <h3 class="section-title">{% trans "KURUMSAL" %}</h3>
         <ul class="sidebar-links">
-          <li><a href="{% url 'core:home' %}">Anasayfa</a></li>
-          <li><a href="{% url 'products:list' %}">Tüm Ürünler</a></li>
+          <li><a href="{% url 'core:home' %}">{% trans "Anasayfa" %}</a></li>
+          <li><a href="{% url 'products:list' %}">{% trans "Tüm Ürünler" %}</a></li>
           {% if user.is_authenticated %}
-          <li><a href="{% url 'orders:history' %}">Siparişlerim</a></li>
-          <li><a href="{% url 'accounts:profile' %}">Hesabım</a></li>
+          <li><a href="{% url 'orders:history' %}">{% trans "Siparişlerim" %}</a></li>
+          <li><a href="{% url 'accounts:profile' %}">{% trans "Hesabım" %}</a></li>
           {% else %}
-          <li><button type="button" class="sidebar-link-btn" data-login-open="login">Giriş Yap</button></li>
-          <li><button type="button" class="sidebar-link-btn" data-login-open="register">Kayıt Ol</button></li>
+          <li><button type="button" class="sidebar-link-btn" data-login-open="login">{% trans "Giriş Yap" %}</button></li>
+          <li><button type="button" class="sidebar-link-btn" data-login-open="register">{% trans "Kayıt Ol" %}</button></li>
           {% endif %}
         </ul>
       </div>
 
       <div class="sidebar-section">
-        <h3 class="section-title">KATEGORİLER</h3>
+        <h3 class="section-title">{% trans "KATEGORİLER" %}</h3>
         <ul class="sidebar-links">
           {% for cat in nav_categories %}
           <li><a href="{% url 'products:by_category' cat.slug %}">{{ cat.name }}</a></li>
@@ -112,13 +131,13 @@
       </div>
 
       <div class="sidebar-section">
-        <h3 class="section-title">İLETİŞİM</h3>
+        <h3 class="section-title">{% trans "İLETİŞİM" %}</h3>
         <div class="contact-list">
           <div class="contact-item">
             <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
             <div class="contact-info">
-              <strong>Adres</strong>
-              <p>[Mağaza / depo adresinizi buraya yazın]</p>
+              <strong>{% trans "Adres" %}</strong>
+              <p>{% trans "[Mağaza / depo adresinizi buraya yazın]" %}</p>
             </div>
           </div>
           <div class="contact-item">
@@ -137,7 +156,7 @@
         <div class="icon-box-sm"><i class="fa-brands fa-instagram"></i></div>
         <span>INSTAGRAM</span>
       </a>
-      <p class="copyright-text">&copy; {% now "Y" %} Yapay Çiçek Deposu</p>
+      <p class="copyright-text">&copy; {% now "Y" %} {% trans "Yapay Çiçek Deposu" %}</p>
     </div>
   </nav>
   {% if nav_categories %}

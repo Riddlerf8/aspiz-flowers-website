@@ -144,10 +144,35 @@ class Product(models.Model):
 
     @property
     def price_range(self):
-        tiers = list(self.price_tiers.order_by("min_quantity"))
+        """
+        Only tiers with a real price count toward the shown range — a
+        contact-only tier (PriceTier.price left blank, e.g. '≥400 adet: DM')
+        has no numeric value to range against. See has_contact_tier /
+        contact_tier for surfacing that tier separately in templates.
+        """
+        tiers = [t for t in self.price_tiers.order_by("min_quantity") if t.price is not None]
         if not tiers:
             return None
         return {"min": tiers[-1].price, "max": tiers[0].price}
+
+    @property
+    def contact_tier(self):
+        """The single 'DM for price' tier, if this product has one (see
+        PriceTier.clean: at most one such tier is allowed, and it must be
+        the highest-quantity tier)."""
+        return self.price_tiers.filter(price__isnull=True).order_by("min_quantity").first()
+
+    @property
+    def has_contact_tier(self):
+        return self.contact_tier is not None
+
+    @property
+    def highest_priced_tier(self):
+        """The highest-quantity tier that still has a real price — used as
+        the default quantity-box highlight/selection, since the contact-only
+        ('DM') tier (if any) isn't something the qty input can default to."""
+        tiers = [t for t in self.price_tiers.order_by("min_quantity") if t.price is not None]
+        return tiers[-1] if tiers else None
 
     @property
     def original_price_range(self):
@@ -224,19 +249,48 @@ class PriceTier(models.Model):
     """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="price_tiers")
     min_quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text=(
+            "Boş bırakılırsa bu kademe 'DM' (mesajla fiyat) olarak gösterilir — "
+            "örn. 400 adet ve üzeri için sabit fiyat yerine WhatsApp'tan fiyat alınır. "
+            "Sadece en yüksek adetli kademe boş bırakılabilir."
+        ),
+    )
 
     class Meta:
         ordering = ["min_quantity"]
         unique_together = ("product", "min_quantity")
 
     def __str__(self):
-        return f"{self.product.name}: {self.min_quantity}+ -> {self.price}"
+        price_label = f"{self.price}" if self.price is not None else "DM"
+        return f"{self.product.name}: {self.min_quantity}+ -> {price_label}"
+
+    @property
+    def is_contact_price(self):
+        return self.price is None
 
     def clean(self):
-        # Fewer units must never cost less than more units.
-        higher_tiers = PriceTier.objects.filter(
-            product=self.product, min_quantity__gt=self.min_quantity
-        ).exclude(pk=self.pk)
-        if higher_tiers.filter(price__gte=self.price).exists():
-            raise ValidationError("قیمت پله‌های بالاتر باید کمتر یا مساوی این پله باشد.")
+        # Fewer units must never cost less than more units (contact-only
+        # tiers have no numeric price, so they're skipped on both sides).
+        if self.price is not None:
+            higher_tiers = PriceTier.objects.filter(
+                product=self.product, min_quantity__gt=self.min_quantity
+            ).exclude(pk=self.pk).exclude(price__isnull=True)
+            if higher_tiers.filter(price__gte=self.price).exists():
+                raise ValidationError("قیمت پله‌های بالاتر باید کمتر یا مساوی این پله باشد.")
+
+        # A contact-only ("DM") tier only makes sense as the highest-quantity
+        # tier — every lower tier must still have a real, checkout-usable price.
+        if self.price is None:
+            lower_tiers_without_price = PriceTier.objects.filter(
+                product=self.product, min_quantity__lt=self.min_quantity, price__isnull=True
+            ).exclude(pk=self.pk)
+            if lower_tiers_without_price.exists():
+                raise ValidationError("سبد قیمت فقط برای بالاترین پله (بیشترین حداقل تعداد) می‌تواند خالی (DM) باشد.")
+        else:
+            higher_contact_tiers = PriceTier.objects.filter(
+                product=self.product, min_quantity__gt=self.min_quantity, price__isnull=True
+            ).exclude(pk=self.pk)
+            if higher_contact_tiers.exists():
+                raise ValidationError("پله DM باید بالاترین پله (بیشترین حداقل تعداد) باشد.")

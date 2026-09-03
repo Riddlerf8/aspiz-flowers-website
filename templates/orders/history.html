@@ -12,7 +12,7 @@
             <p class="text-xs text-wine-400 dark:text-[#a39c8f]">{{ order.created_at|date:"d.m.Y H:i" }}</p>
           </div>
           <span class="text-xs px-3 py-1 rounded-pill bg-cream-100 dark:bg-[#242424] text-wine-600 dark:text-[#d8cdbd]">{{ order.get_status_display }}</span>
-          <span class="font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ order.total }}$</span>
+          <span class="font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ order.total }} ₺</span>
         </a>
       {% endfor %}
     </div>

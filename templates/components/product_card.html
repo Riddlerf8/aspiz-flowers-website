@@ -1,82 +1,102 @@
 {% comment %}
 Usage: {% include "components/product_card.html" with product=product %}
+Flat "catalogue card" style, fully themed via the site's own CSS variables
+(--bg-card, --bg-main, --text-main, --text-muted, --accent-plum, --border-color
+from static/vendor/css/site.css) so it automatically matches light/dark mode
+instead of using hardcoded neutral/black colors.
 {% endcomment %}
-<div class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/40 bg-white/40 shadow-lg backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/60 hover:shadow-xl hover:shadow-wine-900/10 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20 dark:hover:shadow-black/40">
+<div class="group flex h-full flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1"
+     style="background-color: var(--bg-card); border-color: var(--border-color); box-shadow: var(--shadow-sm);"
+     onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
 
-  <a href="{{ product.get_absolute_url }}" class="relative block aspect-[4/5] overflow-hidden bg-gradient-to-br from-cream-100 to-rose-100/60 dark:from-[#242424] dark:to-[#2a1c22]">
-    {% if product.primary_image %}
-      <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
-           onerror="this.replaceWith(Object.assign(document.createElement('div'), {className: 'w-full h-full flex items-center justify-center text-wine-200 dark:text-white/20 text-2xl', innerHTML: '<i class=&quot;fa-solid fa-seedling&quot;></i>'}))"
-           class="w-full h-full object-cover {% if product.is_sold_out %}grayscale opacity-70{% else %}group-hover:scale-105{% endif %} transition-transform duration-300">
-    {% else %}
-      <div class="w-full h-full flex items-center justify-center text-wine-200 dark:text-white/20 text-2xl">
-        <i class="fa-solid fa-seedling"></i>
-      </div>
-    {% endif %}
+  <div class="relative aspect-[4/5] overflow-hidden" style="background-color: var(--bg-main);">
+    <a href="{{ product.get_absolute_url }}" class="absolute inset-0 block">
+      {% if product.primary_image %}
+        <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
+             onerror="this.replaceWith(Object.assign(document.createElement('div'), {className: 'w-full h-full flex items-center justify-center text-2xl', style: 'color: var(--text-muted); opacity:.5', innerHTML: '<i class=&quot;fa-solid fa-seedling&quot;></i>'}))"
+             class="h-full w-full object-cover transition-transform duration-500 {% if product.is_sold_out %}grayscale opacity-70{% else %}group-hover:scale-105{% endif %}">
+      {% else %}
+        <div class="flex h-full w-full items-center justify-center text-2xl" style="color: var(--text-muted); opacity:.5">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+      {% endif %}
+    </a>
 
-    {% if product.discount_percent %}
-      <span class="absolute top-2 left-2 z-10 rounded-pill border border-white/30 bg-red-600/80 px-2 py-1 text-[10px] font-bold text-white shadow-sm backdrop-blur-md">
-        -%{{ product.discount_percent }}
-      </span>
-    {% endif %}
+    <div class="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
+      {% if product.discount_percent %}
+        <span class="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold text-white shadow-sm">
+          -%{{ product.discount_percent }}
+        </span>
+      {% endif %}
+      {% if product.display_badge %}
+        <span class="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm" style="background-color: var(--accent-plum);">
+          {{ product.display_badge }}
+        </span>
+      {% endif %}
+    </div>
 
-    {% if product.display_badge %}
-      <span class="absolute top-2 right-2 z-10 rounded-pill border border-white/30 bg-gradient-to-r {{ product.badge_gradient_classes }} px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white shadow-sm backdrop-blur-md">
-        {{ product.display_badge|upper }}
-      </span>
-    {% endif %}
+    <button type="button"
+            {% if product.is_sold_out %}disabled{% endif %}
+            data-action="add-to-cart" data-product-id="{{ product.id }}"
+            aria-label="Sepete Ekle"
+            class="absolute right-3 top-3 z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-md transition
+                   {% if product.is_sold_out %}cursor-not-allowed opacity-50{% else %}hover:scale-110 active:scale-95{% endif %}"
+            style="background-color: var(--bg-card); color: var(--accent-plum);">
+      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+      </svg>
+    </button>
 
     {% if product.is_sold_out %}
-      <div class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-md dark:bg-black/40">
-        <span class="rounded-pill border border-white/30 bg-white/50 px-3 py-1 text-[11px] font-semibold tracking-wide text-wine-900 shadow-sm backdrop-blur-md dark:bg-black/40 dark:text-white">
+      <div class="absolute inset-0 flex items-center justify-center bg-black/45">
+        <span class="rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide shadow-sm" style="background-color: var(--bg-card); color: var(--text-main);">
           Tükendi
         </span>
       </div>
     {% endif %}
-  </a>
+  </div>
 
-  <div class="flex flex-1 flex-col border-t border-white/40 bg-white/30 p-4 backdrop-blur-md dark:border-white/5 dark:bg-white/[0.03]">
+  <div class="flex flex-1 flex-col p-3.5 md:p-4">
     <a href="{{ product.get_absolute_url }}"
-       class="mb-1.5 block font-serif text-[0.95rem] leading-snug text-wine-900 line-clamp-2 transition-colors hover:text-wine-700 dark:text-[#f5f3ef] dark:hover:text-[#e8dfc8]">
+       class="mb-1 block text-[12.5px] font-bold uppercase leading-snug tracking-wide line-clamp-2 transition-colors"
+       style="color: var(--text-main);">
       {{ product.name }}
     </a>
 
-    <p class="mb-3 text-[11px] text-wine-400 dark:text-[#a39c8f]">
-      Min. {{ product.price_tiers.first.min_quantity|default:"1" }} adet
-    </p>
+    {% if product.description %}
+      <p class="mb-3 text-[12px] leading-snug line-clamp-2" style="color: var(--text-muted);">
+        {{ product.description }}
+      </p>
+    {% endif %}
 
-    <div class="mt-auto flex items-end justify-between gap-2 pt-1">
+    <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-1">
       {% if product.is_sold_out %}
-        <span class="inline-block rounded-pill bg-rose-100/70 px-2.5 py-1 text-[11px] font-semibold text-wine-700 backdrop-blur-sm dark:bg-white/10 dark:text-[#a39c8f]">
+        <span class="inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold" style="background-color: var(--bg-main); color: var(--text-muted);">
           Tükendi
         </span>
       {% else %}
         {% with pr=product.price_range opr=product.original_price_range %}
-          <div class="flex flex-col leading-tight">
-            {% if opr %}
-              <span class="text-[11px] text-wine-300 line-through dark:text-[#a39c8f]">{{ opr.min }}$ - {{ opr.max }}$</span>
-            {% endif %}
-            {% if pr %}
-              <span class="text-sm font-semibold {% if opr %}text-emerald-600 dark:text-emerald-400{% else %}text-wine-800 dark:text-[#f5f3ef]{% endif %}">
-                {{ pr.min }}$ - {{ pr.max }}$
-              </span>
-            {% else %}
-              <span class="text-sm font-semibold text-wine-800 dark:text-[#f5f3ef]">-</span>
-            {% endif %}
-          </div>
+          {% if pr %}
+            <span class="text-[14.5px] font-bold" style="color: var(--text-main);">
+              {{ pr.min }} ₺ - {{ pr.max }} ₺
+            </span>
+          {% elif product.has_contact_tier %}
+            <span class="text-[14.5px] font-bold text-emerald-600">DM</span>
+          {% else %}
+            <span class="text-[14.5px] font-bold" style="color: var(--text-main);">-</span>
+          {% endif %}
+          {% if opr %}
+            <span class="text-[12px] line-through" style="color: var(--text-muted); opacity:.75;">
+              {{ opr.min }} ₺ - {{ opr.max }} ₺
+            </span>
+          {% endif %}
+          {% if product.has_contact_tier and pr %}
+            <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50">
+              <i class="fa-brands fa-whatsapp"></i> {{ product.contact_tier.min_quantity }}+ DM
+            </span>
+          {% endif %}
         {% endwith %}
       {% endif %}
-
-      <button type="button"
-              {% if product.is_sold_out %}disabled{% endif %}
-              data-action="add-to-cart" data-product-id="{{ product.id }}"
-              aria-label="Sepete Ekle"
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition
-                     {% if product.is_sold_out %}cursor-not-allowed border-white/20 bg-white/20 text-wine-300 dark:border-white/10 dark:bg-white/5 dark:text-white/30{% else %}border-white/30 bg-wine-800/90 text-white hover:scale-105 hover:bg-wine-900 active:scale-95 dark:border-white/20 dark:bg-[#e8dfc8]/90 dark:text-wine-900 dark:hover:bg-[#f5f3ef]{% endif %}">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-        </svg>
-      </button>
     </div>
   </div>
 </div>

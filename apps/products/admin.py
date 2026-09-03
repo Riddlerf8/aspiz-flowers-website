@@ -38,6 +38,8 @@ class PriceTierInline(admin.TabularInline):
     model = PriceTier
     extra = 1
     fields = ("min_quantity", "price")
+    # Leave "price" blank on the highest-quantity row to show that tier as
+    # "DM" (contact for price) instead of a fixed amount — see PriceTier.clean.
 
 
 @admin.register(Product)

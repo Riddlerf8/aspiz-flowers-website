@@ -66,15 +66,25 @@
       {% if product.price_tiers.all %}
         <div class="grid grid-cols-3 gap-2 mb-4">
           {% for tier in product.price_tiers.all %}
-            <button type="button" data-tier-select data-tier-min-qty="{{ tier.min_quantity }}"
-                    class="tier-box {% if forloop.last %}tier-active{% endif %} text-left border border-cream-200 dark:border-white/10 rounded-xl px-3 py-2.5 transition">
-              <span class="block tier-price text-base font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ tier.price }}$</span>
-              <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">
-                {% if forloop.last %}≥{{ tier.min_quantity }} ad
-                {% elif forloop.first %}Min. {{ tier.min_quantity }} ad
-                {% else %}{{ tier.min_quantity }}+ ad{% endif %}
-              </span>
-            </button>
+            {% if tier.is_contact_price %}
+              <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}?text={{ product.name|urlencode }}{{ ' - '|urlencode }}{{ tier.min_quantity|stringformat:'s'|add:'+ adet için fiyat almak istiyorum.'|urlencode }}"
+                 target="_blank" rel="noopener noreferrer" data-tier-contact
+                 class="tier-box text-left border border-dashed border-wine-200 dark:border-[#c9a768]/40 rounded-xl px-3 py-2.5 transition hover:border-wine-400">
+                <span class="block tier-price text-base font-semibold text-emerald-600">
+                  <i class="fa-brands fa-whatsapp"></i> DM
+                </span>
+                <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">≥{{ tier.min_quantity }} ad</span>
+              </a>
+            {% else %}
+              <button type="button" data-tier-select data-tier-min-qty="{{ tier.min_quantity }}"
+                      class="tier-box {% if tier.pk == product.highest_priced_tier.pk %}tier-active{% endif %} text-left border border-cream-200 dark:border-white/10 rounded-xl px-3 py-2.5 transition">
+                <span class="block tier-price text-base font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ tier.price }} ₺</span>
+                <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">
+                  {% if forloop.first %}Min. {{ tier.min_quantity }} ad
+                  {% else %}{{ tier.min_quantity }}+ ad{% endif %}
+                </span>
+              </button>
+            {% endif %}
           {% endfor %}
         </div>
       {% endif %}
@@ -97,7 +107,7 @@
       <form action="{% url 'cart:add' product.id %}" method="post" class="flex items-center gap-3 mb-3">
         {% csrf_token %}
         <input type="number" name="quantity" data-qty-input
-               value="{{ product.price_tiers.last.min_quantity|default:1 }}" min="1"
+               value="{{ product.highest_priced_tier.min_quantity|default:1 }}" min="1"
                max="{{ product.stock_quantity }}" {% if product.is_sold_out %}disabled{% endif %}
                class="w-24 rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm">
         <button type="submit" {% if product.is_sold_out %}disabled{% endif %}

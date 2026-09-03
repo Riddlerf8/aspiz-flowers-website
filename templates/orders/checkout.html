@@ -7,12 +7,12 @@
     {% for item in cart.items.all %}
       <div class="flex items-center justify-between p-4 text-sm">
         <span class="text-wine-700 dark:text-[#e8dfc8]">{{ item.quantity }} x {{ item.product.name }}</span>
-        <span class="font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ item.line_total }}$</span>
+        <span class="font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ item.line_total }} ₺</span>
       </div>
     {% endfor %}
     <div class="flex items-center justify-between p-4 font-semibold">
       <span>Toplam</span>
-      <span class="text-lg text-wine-900 dark:text-[#f5f3ef]">{{ cart.total_price }}$</span>
+      <span class="text-lg text-wine-900 dark:text-[#f5f3ef]">{{ cart.total_price }} ₺</span>
     </div>
   </div>
 

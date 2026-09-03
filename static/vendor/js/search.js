@@ -6,11 +6,13 @@
  * tıklanınca (veya Enter/ok tuşlarıyla seçilince) doğrudan o ürünün
  * sayfasına gidilir. Enter/ARA butonu, dropdown açık değilken hâlâ normal
  * form submit ile products:list?q=... sayfasına gönderir (mevcut davranış).
+ *
+ * Sayfada birden fazla arama kutusu olabilir (masaüstü header + mobil
+ * sidebar) — her biri kendi bağımsız state/debounce'una sahip olacak
+ * şekilde ayrı ayrı bağlanıyor (querySelectorAll + forEach), tek bir
+ * querySelector değil.
  */
-(() => {
-  const form = document.querySelector("[data-search-container]");
-  if (!form) return;
-
+document.querySelectorAll("[data-search-container]").forEach((form) => {
   const input = form.querySelector("[data-search-input]");
   const resultsBox = form.querySelector("[data-search-results]");
   if (!input || !resultsBox) return;
@@ -126,4 +128,4 @@
       resultsBox.classList.add("active");
     }
   });
-})();
+});

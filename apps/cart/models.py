@@ -53,8 +53,16 @@ class CartItem(models.Model):
     @property
     def unit_price(self):
         """Uses the best applicable wholesale tier price, falling back to
-        the lowest tier price if the ordered quantity is below every tier."""
-        tiers = list(self.product.price_tiers.order_by("-min_quantity"))
+        the lowest tier price if the ordered quantity is below every tier.
+
+        Contact-only ("DM") tiers have no fixed price, so the cart/checkout
+        total can never be computed from one — those quantities fall back
+        to the highest tier that DOES have a price. The customer still sees
+        the "DM" prompt on the product page and is nudged to WhatsApp for
+        an actual quote at that volume; this fallback only keeps the cart
+        math sane if they add that quantity anyway.
+        """
+        tiers = [t for t in self.product.price_tiers.order_by("-min_quantity") if t.price is not None]
         for tier in tiers:
             if self.quantity >= tier.min_quantity:
                 return tier.price

@@ -1,14 +1,18 @@
 {% comment %}
 Usage:
-{% include "components/product_section.html" with title="Tüm Ürünler" products=all_products bg="bg-white" see_all_url=... %}
-bg options used in the reference design: bg-white / bg-orange-50 / bg-pink-50 / bg-green-50
-Only the first 4 products are shown here; "Tümünü Gör" links to the full list (see_all_url).
+{% include "components/product_section.html" with title="Tüm Ürünler" products=all_products see_all_url=... %}
+Grid matches templates/products/list.html exactly (grid-cols-2 sm:grid-cols-3 lg:grid-cols-4)
+so cards are the same size everywhere on the site. Colors come from the theme
+CSS variables in static/vendor/css/site.css, so this adapts to light/dark mode
+automatically.
 {% endcomment %}
-<section class="{{ bg|default:"bg-white" }} dark:bg-[#1c1c1c] rounded-2xl px-4 md:px-6 py-6">
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="font-serif text-lg md:text-xl text-wine-900 dark:text-[#f5f3ef]">{{ title }}</h2>
+<section class="px-4 py-8 md:px-6 md:py-10">
+  <div class="mb-5 flex items-end justify-between md:mb-7">
+    <h2 class="font-display text-3xl uppercase leading-none tracking-wide md:text-4xl" style="color: var(--text-main);">
+      {{ title }}
+    </h2>
     {% if see_all_url and products|length > 4 %}
-      <a href="{{ see_all_url }}" class="text-sm text-wine-500 dark:text-[#c9b28a] hover:text-wine-700 dark:hover:text-[#e8dfc8] flex items-center gap-1">
+      <a href="{{ see_all_url }}" class="flex shrink-0 items-center gap-1 text-sm font-medium transition-colors" style="color: var(--text-muted);">
         Tümünü Gör
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
@@ -17,11 +21,11 @@ Only the first 4 products are shown here; "Tümünü Gör" links to the full lis
     {% endif %}
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
     {% for product in products|slice:":4" %}
       {% include "components/product_card.html" with product=product %}
     {% empty %}
-      <p class="col-span-full text-sm text-wine-300 dark:text-[#a39c8f]">Bu bölümde henüz ürün yok.</p>
+      <p class="col-span-full text-sm" style="color: var(--text-muted);">Bu bölümde henüz ürün yok.</p>
     {% endfor %}
   </div>
 </section>
