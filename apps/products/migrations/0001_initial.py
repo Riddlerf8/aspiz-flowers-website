@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(blank=True, unique=True)),
                 ('sku', models.CharField(max_length=30, unique=True, verbose_name='SKU')),
                 ('description', models.TextField(blank=True)),
-                ('badge', models.CharField(choices=[('none', 'بدون بج'), ('editor', 'Editörün Seçimi'), ('new', 'Yeni Sezon'), ('deal', 'Fırsat'), ('popular', 'Popüler'), ('special', 'Özel Seri'), ('low_stock', 'Tükenmek Üzere')], default='none', max_length=20)),
+                ('badge', models.CharField(choices=[('none', 'Rozet yok'), ('editor', 'Editörün Seçimi'), ('new', 'Yeni Sezon'), ('deal', 'Fırsat'), ('popular', 'Popüler'), ('special', 'Özel Seri'), ('low_stock', 'Tükenmek Üzere')], default='none', max_length=20)),
                 ('discount_percent', models.PositiveIntegerField(default=0)),
                 ('stock_quantity', models.PositiveIntegerField(default=0)),
                 ('low_stock_threshold', models.PositiveIntegerField(default=10)),

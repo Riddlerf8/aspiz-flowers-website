@@ -11,6 +11,16 @@ LIVE_SEARCH_LIMIT = 8
 
 def product_list(request):
     products = Product.objects.filter(is_active=True).select_related("category")
+    active_filter = request.GET.get("filter")
+
+    if active_filter == "new":
+        products = products.order_by("-created_at")
+    elif active_filter == "deal":
+        products = products.filter(discount_percent__gt=0).order_by("-discount_percent", "-created_at")
+    elif active_filter == "popular":
+        products = products.filter(badge=Product.Badge.POPULAR).order_by("-created_at")
+    else:
+        active_filter = ""
 
     category_slug = request.GET.get("category")
     if category_slug:
@@ -29,6 +39,7 @@ def product_list(request):
         "categories": Category.objects.all(),
         "active_category": category_slug,
         "query": query or "",
+        "active_filter": active_filter,
     }
     return render(request, "products/list.html", context)
 
@@ -69,6 +80,16 @@ def product_search_api(request):
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
     products = Product.objects.filter(category=category, is_active=True)
+    active_filter = request.GET.get("filter")
+
+    if active_filter == "new":
+        products = products.order_by("-created_at")
+    elif active_filter == "deal":
+        products = products.filter(discount_percent__gt=0).order_by("-discount_percent", "-created_at")
+    elif active_filter == "popular":
+        products = products.filter(badge=Product.Badge.POPULAR).order_by("-created_at")
+    else:
+        active_filter = ""
 
     paginator = Paginator(products, 24)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -79,6 +100,7 @@ def category_detail(request, slug):
         "products": page_obj.object_list,
         "categories": Category.objects.all(),
         "active_category": slug,
+        "active_filter": active_filter,
     }
     return render(request, "products/list.html", context)
 

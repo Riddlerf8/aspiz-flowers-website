@@ -1,29 +1,89 @@
 {% extends "base.html" %}
-{% block title %}Siparişi Tamamla - Çiçek Deposu{% endblock %}
+{% block title %}{% if order %}Sipariş #{{ order.pk }}{% else %}Siparişi Tamamla{% endif %} - Çiçek Deposu{% endblock %}
+
+{% block extra_head %}
+<style>
+  .order-page { max-width: 920px; margin: 0 auto; padding: 2.5rem 0 4rem; }
+  .order-kicker { color: var(--accent-gold); font-size: .7rem; letter-spacing: .28em; text-transform: uppercase; }
+  .order-title { margin: .35rem 0 1.5rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.65rem, 3vw, 2.4rem); font-weight: 600; line-height: 1; }
+  .order-rule { width: 64px; height: 2px; margin-bottom: 2rem; background: var(--accent-gold); }
+  .order-panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); }
+  .order-line { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.15rem 1.35rem; border-bottom: 1px solid var(--border-color); }
+  .order-line-name { color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; }
+  .order-line-price { color: var(--accent-plum); font-weight: 700; white-space: nowrap; }
+  .order-total { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 1.5rem 1.35rem; background: var(--bg-main); }
+  .order-total strong { color: var(--accent-plum); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; }
+  .order-address { margin: 1rem 0 1.5rem; padding: 1.15rem 1.35rem; border-left: 3px solid var(--accent-gold); background: color-mix(in srgb, var(--bg-card) 70%, transparent); color: var(--text-muted); }
+  .order-address strong { display: block; margin-bottom: .25rem; color: var(--text-main); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
+  .order-action { display: flex; align-items: center; justify-content: center; gap: .55rem; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-weight: 700; letter-spacing: .06em; transition: var(--transition); }
+  .order-action:hover { background: var(--bg-nav); transform: translateY(-2px); }
+  .order-note { margin: .85rem auto 0; max-width: 680px; color: var(--text-muted); font-size: .75rem; text-align: center; }
+  .order-status { display: inline-flex; align-items: center; gap: .5rem; color: var(--accent-gold); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; }
+  .order-cancel { display: inline-block; margin-top: 1.75rem; color: #b4233e; font-size: .8rem; text-decoration: underline; }
+  @media (max-width: 640px) { .order-page { padding-top: 1rem; } .order-line { align-items: flex-start; } .order-total { align-items: flex-end; } }
+</style>
+{% endblock %}
+
 {% block content %}
-  <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6">Siparişi Tamamla</h1>
-
-  <div class="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 divide-y divide-cream-100 mb-6">
-    {% for item in cart.items.all %}
-      <div class="flex items-center justify-between p-4 text-sm">
-        <span class="text-wine-700 dark:text-[#e8dfc8]">{{ item.quantity }} x {{ item.product.name }}</span>
-        <span class="font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ item.line_total }} ₺</span>
+  <section class="order-page">
+    {% if order %}
+      <span class="order-kicker">Aspiz Flowers · Siparişiniz</span>
+      <h1 class="order-title">Sipariş #{{ order.pk }}</h1>
+      <div class="order-rule"></div>
+      <div class="order-status"><i class="fa-regular fa-clock"></i> {{ order.get_status_display }}</div>
+      <div class="order-panel" style="margin-top: 1.25rem;">
+        {% for item in order.items.all %}
+          <div class="order-line">
+            <span class="order-line-name">{{ item.quantity }} × {{ item.product.name }}</span>
+            <span class="order-line-price">{{ item.line_total }} ₺</span>
+          </div>
+        {% endfor %}
+        <div class="order-total"><span>Toplam</span><strong>{{ order.total }} ₺</strong></div>
       </div>
-    {% endfor %}
-    <div class="flex items-center justify-between p-4 font-semibold">
-      <span>Toplam</span>
-      <span class="text-lg text-wine-900 dark:text-[#f5f3ef]">{{ cart.total_price }} ₺</span>
-    </div>
-  </div>
 
-  <div class="bg-cream-50 dark:bg-[#1c1c1c] rounded-2xl p-4 mb-6 text-sm text-wine-600 dark:text-[#d8cdbd]">
-    <p><strong>Teslimat Adresi:</strong> {{ user.address|default:"Profilinizde adres kaydınız yok." }}</p>
-  </div>
+      {% if whatsapp_link %}
+        <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" data-whatsapp-checkout-link class="order-action" style="margin-top: 1.5rem;">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp üzerinden doğrudan ödeme
+        </a>
+        <p class="order-note">Sipariş bilgileriniz WhatsApp üzerinden mağazamıza iletilir; ekibimiz aynı sohbet üzerinden size dönüş yapar.</p>
+      {% endif %}
 
-  <form action="{% url 'orders:checkout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-3 font-medium">
-      Siparişi Onayla
-    </button>
-  </form>
+      {% if not whatsapp_link %}
+        {% if order.status == "pending" or order.status == "confirmed" %}
+          <form action="{% url 'orders:cancel' order.pk %}" method="post" onsubmit="return confirm('Siparişi iptal etmek istediğinize emin misiniz?');">
+            {% csrf_token %}
+            <button type="submit" class="order-cancel">Siparişi İptal Et</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    {% else %}
+      <span class="order-kicker">Aspiz Flowers · Son Adım</span>
+      <h1 class="order-title">Siparişi Tamamla</h1>
+      <div class="order-rule"></div>
+      <div class="order-panel">
+        {% for item in cart.items.all %}
+          <div class="order-line">
+            <span class="order-line-name">{{ item.quantity }} × {{ item.product.name }}</span>
+            <span class="order-line-price">{{ item.line_total }} ₺</span>
+          </div>
+        {% endfor %}
+        <div class="order-total"><span>Toplam</span><strong>{{ cart.total_price }} ₺</strong></div>
+      </div>
+      <div class="order-address"><strong>Teslimat Adresi</strong>{{ user.address|default:"Profilinizde adres kaydınız yok." }}</div>
+      <form action="{% url 'orders:checkout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="order-action"><i class="fa-brands fa-whatsapp"></i> WhatsApp üzerinden doğrudan ödeme</button>
+        <p class="order-note">Bu düğmeye tıkladığınızda siparişiniz oluşturulur ve ödeme ile teslimat için WhatsApp üzerinden mağazamıza gönderilir.</p>
+      </form>
+    {% endif %}
+  </section>
+
+  {% if auto_open_whatsapp %}
+    <script>
+      (function () {
+        var link = document.querySelector('[data-whatsapp-checkout-link]');
+        if (link) { window.open(link.href, '_blank', 'noopener,noreferrer'); }
+      })();
+    </script>
+  {% endif %}
 {% endblock %}

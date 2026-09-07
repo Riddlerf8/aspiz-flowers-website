@@ -14,7 +14,7 @@ MAX_DIMENSION = 1600  # px, longest side after resize
 def validate_image_size(file):
     limit_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if file.size > limit_bytes:
-        raise ValidationError(f"حجم عکس نباید بیشتر از {MAX_UPLOAD_MB} مگابایت باشد.")
+        raise ValidationError(f"Görsel boyutu {MAX_UPLOAD_MB} MB'den fazla olamaz.")
 
 
 class Category(models.Model):
@@ -38,7 +38,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     class Badge(models.TextChoices):
-        NONE = "none", "بدون بج"
+        NONE = "none", "Rozet yok"
         EDITOR_CHOICE = "editor", "Editörün Seçimi"
         NEW_SEASON = "new", "Yeni Sezon"
         DEAL = "deal", "Fırsat"
@@ -203,4 +203,4 @@ class PriceTier(models.Model):
             product=self.product, min_quantity__gt=self.min_quantity
         ).exclude(pk=self.pk)
         if higher_tiers.filter(price__gte=self.price).exists():
-            raise ValidationError("قیمت پله‌های بالاتر باید کمتر یا مساوی این پله باشد.")
+            raise ValidationError("Daha yüksek kademelerin fiyatı bu kademeye eşit veya daha düşük olmalıdır.")

@@ -1,25 +1,37 @@
 import secrets
+import re
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.hashers import check_password, make_password
 from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.db import transaction
 from django.shortcuts import redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from requests import RequestException
 
 from apps.orders.models import Order
 
 from . import google_oauth
-from .forms import LoginForm, ProfileForm, RegisterForm, _unique_username_from_email
+from django.utils import timezone
+
+from .forms import LoginRequestForm, LoginVerifyForm, ProfileForm, RegisterForm, _unique_username_from_email
+from .models import LoginCode
 from .ratelimit import (
+    clear_code_verify_failures,
     clear_login_failures,
+    is_code_request_rate_limited,
+    is_code_verify_locked,
     is_login_locked,
     is_register_rate_limited,
     register_attempt,
+    register_code_request,
+    register_code_verify_failure,
     register_login_failure,
 )
 
@@ -32,50 +44,163 @@ def _is_ajax(request):
 
 LOGIN_LOCKOUT_MESSAGE = "Çok fazla başarısız giriş denemesi yapıldı. Lütfen 15 dakika sonra tekrar deneyin."
 REGISTER_RATE_LIMIT_MESSAGE = "Çok fazla kayıt denemesi yapıldı. Lütfen daha sonra tekrar deneyin."
+CODE_REQUEST_RATE_LIMIT_MESSAGE = "Çok fazla kod talebi yapıldı. Lütfen biraz sonra tekrar deneyin."
+CODE_VERIFY_LOCKOUT_MESSAGE = "Çok fazla hatalı kod denemesi yapıldı. Lütfen yeniden giriş yapmayı deneyin."
+_ACCOUNT_NOT_FOUND_MESSAGE = "E-posta ve telefon numarası eşleşmedi."
+_CODE_SEND_FAILED_MESSAGE = "Giriş kodu gönderilemedi. E-posta ayarlarını kontrol edin."
 
 
-class UserLoginView(LoginView):
-    template_name = "accounts/login.html"
-    authentication_form = LoginForm
-    redirect_authenticated_user = True
+def _issue_login_code(user):
+    """
+    Create a fresh LoginCode for `user`, email it, and return it.
 
-    def post(self, request, *args, **kwargs):
-        # Brute-force guard: block further attempts for this IP+identifier
-        # pair before Django even touches the DB/password hasher.
-        identifier = (request.POST.get("username") or "").strip()
-        if identifier and is_login_locked(request, identifier):
-            if _is_ajax(request):
-                return JsonResponse(
-                    {"success": False, "errors": {"__all__": [LOGIN_LOCKOUT_MESSAGE]}},
-                    status=429,
-                )
-            messages.error(request, LOGIN_LOCKOUT_MESSAGE)
-            return redirect("accounts:login")
-        return super().post(request, *args, **kwargs)
+    Shared by login_request_view (existing account, passwordless login) and
+    register_view (brand-new account, one-time email verification) so both
+    flows send/verify codes exactly the same way. Any previously pending
+    code for this user is invalidated first. If the email fails to send,
+    the LoginCode row is rolled back and the exception re-raised so the
+    caller can show an error instead of stranding a code nobody received.
+    """
+    code = f"{secrets.randbelow(1000000):06d}"
+    LoginCode.objects.filter(user=user, used_at__isnull=True).update(used_at=timezone.now())
+    login_code = LoginCode.objects.create(
+        user=user,
+        code_hash=make_password(code),
+        expires_at=timezone.now() + timedelta(minutes=10),
+    )
+    try:
+        send_mail(
+            subject="Aspiz Flowers giriş kodunuz",
+            message=f"Giriş kodunuz: {code}\nBu kod 10 dakika geçerlidir ve tek kullanımlıktır.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+    except Exception:
+        login_code.delete()
+        raise
+    return login_code
 
-    def form_valid(self, form):
-        identifier = form.cleaned_data.get("username", "")
-        if identifier:
-            clear_login_failures(self.request, identifier)
-        response = super().form_valid(form)
-        if not form.cleaned_data.get("remember_me"):
-            # Session ends when the browser closes instead of the default
-            # SESSION_COOKIE_AGE (2 weeks) when "Beni hatırla" isn't checked.
-            self.request.session.set_expiry(0)
-        if _is_ajax(self.request):
-            # The auth modal (auth-modal.js) submits via fetch and expects
-            # JSON back so it can redirect in place instead of Django doing
-            # a normal 302 — the modal never gets a full-page navigation.
-            return JsonResponse({"success": True, "redirect_url": self.get_success_url()})
-        return response
 
-    def form_invalid(self, form):
-        identifier = (self.request.POST.get("username") or "").strip()
-        if identifier:
-            register_login_failure(self.request, identifier)
-        if _is_ajax(self.request):
-            return JsonResponse({"success": False, "errors": form.errors}, status=400)
-        return super().form_invalid(form)
+def login_request_view(request):
+    if request.user.is_authenticated:
+        return redirect("core:home")
+    form = LoginRequestForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data["email"].lower()
+        phone = re.sub(r"\D", "", form.cleaned_data["phone"])
+
+        # Locked/limited by email ONLY (never by email+phone together) —
+        # the phone number is exactly the secret being guessed here, so a
+        # key that includes it would let an attacker try a different phone
+        # every single time and never trip the counter.
+        if is_login_locked(request, email):
+            return _auth_error(request, {"__all__": [LOGIN_LOCKOUT_MESSAGE]}, 429)
+
+        # Also cap how many codes we'll send to a given address in a row,
+        # so a correct-but-not-yours email+phone pair can't be used to
+        # spam someone's inbox, and so an attacker can't dodge the 5-guess
+        # cap below by simply requesting a fresh code every few tries.
+        if is_code_request_rate_limited(request, email):
+            return _auth_error(request, {"__all__": [CODE_REQUEST_RATE_LIMIT_MESSAGE]}, 429)
+
+        user = User.objects.filter(email__iexact=email, phone=phone, is_active=True).first()
+        if not user:
+            register_login_failure(request, email)
+            return _auth_error(request, {"__all__": [_ACCOUNT_NOT_FOUND_MESSAGE]}, 400)
+
+        clear_login_failures(request, email)
+        register_code_request(request, email)
+
+        try:
+            login_code = _issue_login_code(user)
+        except Exception:
+            return _auth_error(request, {"__all__": [_CODE_SEND_FAILED_MESSAGE]}, 503)
+        request.session["login_code_id"] = login_code.pk
+        if _is_ajax(request):
+            return JsonResponse({"success": True, "step": "verify", "message": "Giriş kodu e-posta adresinize gönderildi."})
+        return redirect("accounts:login_verify_page")
+    return _auth_form_response(request, form)
+
+
+def login_verify_page(request):
+    if not request.session.get("login_code_id"):
+        return redirect("accounts:login")
+    return render(request, "accounts/login.html", {"otp_sent": True})
+
+
+def login_verify_view(request):
+    form = LoginVerifyForm(request.POST or None)
+    code_id = request.session.get("login_code_id")
+    if request.method != "POST" or not form.is_valid() or not code_id:
+        return _auth_error(request, {"code": ["Giriş kodu geçersiz veya süresi doldu."]}, 400)
+
+    with transaction.atomic():
+        login_code = (
+            LoginCode.objects.select_for_update()
+            .select_related("user")
+            .filter(pk=code_id)
+            .first()
+        )
+        # Note: unlike before, we don't require login_code.user.is_active
+        # here — a brand-new registration is deliberately created inactive
+        # (see register_view) and only activated a few lines down, once its
+        # code is confirmed. Login-flow codes are always for already-active
+        # users, so this check never mattered for that path anyway.
+        if not login_code:
+            request.session.pop("login_code_id", None)
+            return _auth_error(request, {"code": ["Giriş kodu geçersiz veya süresi doldu."]}, 400)
+
+        user_id = login_code.user_id
+
+        # Locked independently of which code is currently pending: asking
+        # for a brand-new code does NOT reset this counter, unlike the
+        # per-row `attempts` field on LoginCode.
+        if is_code_verify_locked(request, user_id):
+            request.session.pop("login_code_id", None)
+            return _auth_error(request, {"__all__": [CODE_VERIFY_LOCKOUT_MESSAGE]}, 429)
+
+        if not login_code.is_valid:
+            return _auth_error(request, {"code": ["Giriş kodu geçersiz veya süresi doldu."]}, 400)
+
+        login_code.attempts += 1
+        login_code.save(update_fields=["attempts"])
+        if not check_password(form.cleaned_data["code"], login_code.code_hash):
+            register_code_verify_failure(request, user_id)
+            return _auth_error(request, {"code": ["Giriş kodu hatalı."]}, 400)
+
+        login_code.used_at = timezone.now()
+        login_code.save(update_fields=["used_at"])
+        user = login_code.user
+
+        # Flips a just-registered (inactive) account to active the moment
+        # its verification code checks out. No-op for the normal login
+        # flow, where the user is already active.
+        if not user.is_active:
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+
+    clear_code_verify_failures(request, user_id)
+    request.session.pop("login_code_id", None)
+    login(request, user, backend="accounts.backends.EmailOrUsernameBackend")
+    return _auth_success(request, {"redirect_url": request.POST.get("next") or reverse("core:home")})
+
+
+def _auth_success(request, data):
+    return JsonResponse({"success": True, **data}) if _is_ajax(request) else redirect(data.get("redirect_url", "accounts:login"))
+
+
+def _auth_error(request, errors, status=400):
+    if _is_ajax(request):
+        return JsonResponse({"success": False, "errors": errors}, status=status)
+    messages.error(request, next(iter(errors.values()))[0])
+    return redirect("accounts:login")
+
+
+def _auth_form_response(request, form):
+    if _is_ajax(request):
+        return JsonResponse({"success": False, "errors": form.errors}, status=400)
+    return render(request, "accounts/login.html", {"form": form})
 
 
 def register_view(request):
@@ -98,16 +223,42 @@ def register_view(request):
 
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user, backend="accounts.backends.EmailOrUsernameBackend")
-            messages.success(request, "Hoş geldin! Hesabın oluşturuldu.")
-            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
-                target = next_url
-            else:
-                target = reverse("core:home")
+            email = form.cleaned_data["email"]
+            # A previous registration with this email may exist but never
+            # got verified (RegisterForm.clean_email only blocks *active*
+            # accounts, so it let this one through). Clear it out first —
+            # otherwise the DB-level unique constraint on email would raise
+            # an IntegrityError on save, and the person who mistyped/never
+            # got their first code would be permanently locked out of that
+            # address.
+            User.objects.filter(email__iexact=email, is_active=False).delete()
+
+            user = form.save(commit=False)
+            # Held inactive — and NOT logged in — until the email code is
+            # verified below, so nobody can enter the site on an email
+            # address they don't actually control. login_verify_view flips
+            # this to True and calls login() once the code checks out.
+            user.is_active = False
+            user.save()
+
+            try:
+                login_code = _issue_login_code(user)
+            except Exception:
+                # Nobody could receive the code, so don't leave a dangling
+                # unverifiable account sitting on this email/phone.
+                user.delete()
+                if ajax:
+                    return JsonResponse({"success": False, "errors": {"__all__": [_CODE_SEND_FAILED_MESSAGE]}}, status=503)
+                messages.error(request, _CODE_SEND_FAILED_MESSAGE)
+                return render(request, "accounts/register.html", {"form": RegisterForm(), "next": next_url})
+
+            request.session["login_code_id"] = login_code.pk
             if ajax:
-                return JsonResponse({"success": True, "redirect_url": target})
-            return redirect(target)
+                return JsonResponse(
+                    {"success": True, "step": "verify", "message": "Hesabınızı doğrulamak için e-posta adresinize bir kod gönderdik."}
+                )
+            messages.info(request, "Hesabınızı doğrulamak için e-posta adresinize bir kod gönderdik.")
+            return redirect("accounts:login_verify_page")
 
         register_attempt(request)
         if ajax:
@@ -205,6 +356,13 @@ def google_callback(request):
         )
         user.set_unusable_password()
         user.save()
+    elif not user.is_active:
+        # An inactive row here is an abandoned manual registration that
+        # never verified its email code (see register_view). Google has
+        # just verified that same address on our behalf, so activate it
+        # rather than leaving a stale is_active=False despite a real login.
+        user.is_active = True
+        user.save(update_fields=["is_active"])
 
     login(request, user, backend="accounts.backends.EmailOrUsernameBackend")
     messages.success(request, "Google hesabınızla giriş yaptınız.")

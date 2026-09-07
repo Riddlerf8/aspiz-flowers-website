@@ -3,10 +3,10 @@
 {% block content %}
   <div class="flex items-center justify-between mb-6">
     <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef]">Sipariş #{{ order.pk }}</h1>
-    <span class="text-xs px-3 py-1 rounded-pill bg-cream-100 dark:bg-[#242424] text-wine-600 dark:text-[#d8cdbd]">{{ order.get_status_display }}</span>
+    <span class="text-xs px-3 py-1 rounded-pill bg-cream-100 dark:bg-[#3a1d2a] text-wine-600 dark:text-[#d8cdbd]">{{ order.get_status_display }}</span>
   </div>
 
-  <div class="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 divide-y divide-cream-100 mb-6">
+  <div class="bg-white dark:bg-[#2b151f] rounded-2xl border border-cream-200 dark:border-white/10 divide-y divide-cream-100 mb-6">
     {% for item in order.items.all %}
       <div class="flex items-center justify-between p-4 text-sm">
         <span class="text-wine-700 dark:text-[#e8dfc8]">{{ item.quantity }} x {{ item.product.name }}</span>
@@ -19,10 +19,32 @@
     </div>
   </div>
 
+  {% if whatsapp_link %}
+    <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" data-whatsapp-checkout-link
+       class="mb-4 flex items-center justify-center gap-2 w-full rounded-pill bg-emerald-600 hover:bg-emerald-700 text-white py-3 font-medium">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp üzerinden doğrudan ödeme
+    </a>
+    <p class="text-xs text-wine-500 dark:text-[#a39c8f] mb-6 text-center">
+      Bu siparişin sepeti ve bilgileri mağazanın WhatsApp yöneticisine gönderilir; yönetici size aynı sohbet üzerinden yanıt verir.
+    </p>
+  {% endif %}
+
   {% if order.status == "pending" or order.status == "confirmed" %}
     <form action="{% url 'orders:cancel' order.pk %}" method="post" onsubmit="return confirm('Siparişi iptal etmek istediğinize emin misiniz?');">
       {% csrf_token %}
       <button type="submit" class="text-sm text-red-600 hover:text-red-800 underline">Siparişi İptal Et</button>
     </form>
+  {% endif %}
+
+  {% if auto_open_whatsapp %}
+    <script>
+      // Fires once, right after checkout, so the customer doesn't have to
+      // find/click the button themselves. If the browser blocks the popup,
+      // the visible button above is the fallback.
+      (function () {
+        var link = document.querySelector('[data-whatsapp-checkout-link]');
+        if (link) { window.open(link.href, '_blank', 'noopener,noreferrer'); }
+      })();
+    </script>
   {% endif %}
 {% endblock %}

@@ -1,24 +1,9 @@
 import re
 
 from django import forms
-from django.contrib.auth.forms import (
-    AuthenticationForm,
-    PasswordResetForm,
-    SetPasswordForm,
-    UserCreationForm,
-)
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 
 from .models import User
-
-
-# bg-white/text-wine-900 burada bilerek belirtiliyor: <meta name="color-scheme"
-# content="light dark"> (base.html) yüzünden, rengi belirtilmemiş input/textarea'lar
-# tarayıcının karanlık moduna göre siyah kutu olarak render edilebiliyordu.
-INPUT_CLASS = (
-    "w-full rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm "
-    "bg-white text-wine-900 placeholder-wine-300 dark:bg-[#1c1c1c] dark:text-[#f5f3ef] "
-    "focus:outline-none focus:border-wine-400"
-)
 
 
 def _unique_username_from_email(email):
@@ -32,13 +17,14 @@ def _unique_username_from_email(email):
     return username
 
 
-class RegisterForm(UserCreationForm):
+class RegisterForm(forms.ModelForm):
     full_name = forms.CharField(
         label="Ad Soyad",
         max_length=150,
         required=True,
     )
     email = forms.EmailField(label="E-posta Adresi", required=True)
+    phone = forms.CharField(label="Telefon Numarası", max_length=20, required=True)
     terms = forms.BooleanField(
         label="Kullanım Şartları'nı okudum ve kabul ediyorum.",
         required=True,
@@ -47,26 +33,36 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("full_name", "email", "password1", "password2", "terms")
+        fields = ("full_name", "email", "phone", "terms")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # UserCreationForm pulls in a "username" field from Meta by default;
-        # we generate it automatically from the email instead of asking for it.
-        self.fields.pop("username", None)
         for field in self.fields.values():
-            field.widget.attrs.setdefault("class", INPUT_CLASS)
+            field.widget.attrs.setdefault("autocomplete", "off")
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email__iexact=email).exists():
+        # is_active=True only: an inactive row is a previous registration
+        # that never verified its email code (see register_view), and
+        # doesn't deserve to permanently squat on the address.
+        if User.objects.filter(email__iexact=email, is_active=True).exists():
             raise forms.ValidationError("Bu e-posta adresi zaten kayıtlı.")
         return email
+
+    def clean_phone(self):
+        phone = re.sub(r"\D", "", self.cleaned_data["phone"])
+        if len(phone) < 10:
+            raise forms.ValidationError("Geçerli bir telefon numarası girin.")
+        if User.objects.filter(phone=phone, is_active=True).exists():
+            raise forms.ValidationError("Bu telefon numarası zaten kayıtlı.")
+        return phone
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
         user.username = _unique_username_from_email(self.cleaned_data["email"])
+        user.phone = self.cleaned_data["phone"]
+        user.set_unusable_password()
 
         full_name = self.cleaned_data["full_name"].strip()
         parts = full_name.split(" ", 1)
@@ -78,19 +74,13 @@ class RegisterForm(UserCreationForm):
         return user
 
 
-class LoginForm(AuthenticationForm):
-    username = forms.CharField(
-        label="E-posta Adresi",
-        widget=forms.TextInput(attrs={
-            "autofocus": True,
-            "class": INPUT_CLASS,
-            "autocomplete": "email",
-        }),
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": INPUT_CLASS}),
-    )
-    remember_me = forms.BooleanField(label="Beni hatırla", required=False)
+class LoginRequestForm(forms.Form):
+    email = forms.EmailField(label="E-posta Adresi")
+    phone = forms.CharField(label="Telefon Numarası", max_length=20)
+
+
+class LoginVerifyForm(forms.Form):
+    code = forms.RegexField(label="Giriş Kodu", regex=r"^\d{6}$", max_length=6, min_length=6)
 
 
 class ProfileForm(forms.ModelForm):
@@ -122,15 +112,19 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError("Bu e-posta adresi zaten kullanılıyor.")
         return email
 
+    def clean_phone(self):
+        phone = re.sub(r"\D", "", self.cleaned_data["phone"])
+        if len(phone) < 10:
+            raise forms.ValidationError("Geçerli bir telefon numarası girin.")
+        exists = User.objects.filter(phone=phone).exclude(pk=self.instance.pk).exists()
+        if exists:
+            raise forms.ValidationError("Bu telefon numarası zaten kullanılıyor.")
+        return phone
+
 
 class StyledPasswordResetForm(PasswordResetForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs.setdefault("class", INPUT_CLASS)
+    """Uses the same .form-group/.input-with-icon design as ProfileForm/the login modal."""
 
 
 class StyledSetPasswordForm(SetPasswordForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault("class", INPUT_CLASS)
+    """Uses the same .form-group/.input-with-icon design as ProfileForm/the login modal."""

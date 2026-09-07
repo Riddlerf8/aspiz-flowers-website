@@ -1,13 +1,17 @@
 {% load static %}
 {% load i18n %}
 <div class="preloader" data-preloader></div>
-<div class="overlay" data-overlay data-nav-toggler></div>
+<div class="overlay" data-overlay data-nav-toggler aria-hidden="true"></div>
 <header class="header-complex" data-header>
   <div class="main-header-wrapper">
     <div class="main-header glass-floating-oval">
       <div class="container header-content">
         <a href="{% url 'core:home' %}" class="logo-area">
-          <i class="fa-solid fa-leaf"></i> Aspiz flowers
+          <img src="{% static 'src/img/logo.svg' %}" alt="" class="site-logo site-logo-header" aria-hidden="true">
+          <span class="logo-wordmark">
+            <span class="logo-wordmark-name">ASPIZ</span>
+            <span class="logo-wordmark-sub">FLOWERS</span>
+          </span>
         </a>
 
         <nav class="header-nav-links">
@@ -20,7 +24,8 @@
 
 
         <div class="header-actions">
-          <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button" aria-label="{% trans 'Temayı değiştir' %}">
+          <button class="icon-action-btn theme-toggle-btn" id="themeToggle" type="button"
+            aria-label="{% trans 'Temayı değiştir' %}">
             <i class="fa-solid fa-moon moon-icon"></i>
             <i class="fa-solid fa-sun sun-icon"></i>
           </button>
@@ -41,7 +46,8 @@
             <span class="cart-count" data-cart-count>{{ cart_item_count|default:0 }}</span>
           </a>
 
-          <button class="nav-open-btn" type="button" aria-label="{% trans 'open menu' %}" data-nav-toggler>
+          <button class="nav-open-btn" type="button" aria-label="{% trans 'Menüyü aç' %}" aria-expanded="false"
+            data-nav-toggler>
             <i class="fa-solid fa-bars"></i>
           </button>
         </div>
@@ -59,44 +65,47 @@
     </video>
     <div class="top-banner-overlay"></div>
     <div class="container top-banner-content">
-      <span class="top-banner-eyebrow">{% trans "En özel ürünlerle" %}</span>
-      <h2>{% trans "Türkiye'nin En Büyük Çiçek Deposu" %}</h2>
+      <span class="top-banner-eyebrow">{% trans "DOĞRUDAN İTHALATÇIDAN" %}</span>
+      <h2>{% trans "YAPAY ÇİÇEKTE <br>AVANTAJLI TOPTAN FİYATLAR" %}</h2>
+      <p class="top-banner-subtitle">{% trans "Geniş ürün seçeneği, hızlı teslimat ve ürün garantisiyle Türkiye geneline hızlı gönderim" %}</p>
 
       <div class="top-banner-actions">
-        <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}" target="_blank" rel="noopener noreferrer" class="hero-btn hero-btn-filled">
-          <i class="fa-brands fa-whatsapp"></i> {% trans "Sipariş Ver" %}
+        <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}" target="_blank" rel="noopener noreferrer"
+          class="hero-btn hero-btn-filled">
+          <i class="fa-brands fa-whatsapp"></i> {% trans "SİPARİŞ VER" %}
         </a>
         <a href="{% url 'products:list' %}" class="hero-btn hero-btn-filled">
           <i class="fa-solid fa-leaf"></i> {% trans "Ürünleri Keşfet" %}
         </a>
       </div>
-
       <div class="top-banner-trust">
-        <span><i class="fa-solid fa-gem"></i> {% trans "Kaliteli Ürünler" %}</span>
-        <span><i class="fa-solid fa-truck-fast"></i> {% trans "Hızlı Teslimat" %}</span>
-        <span><i class="fa-solid fa-heart"></i> {% trans "Özenle Hazırlanır" %}</span>
+        <span><i class="fa-solid fa-gem"></i> {% trans "DOĞRUDAN İTHALAT" %}</span>
+        <span><i class="fa-solid fa-truck-fast"></i> {% trans "HIZLI TESLİMAT" %}</span>
+        <span><i class="fa-solid fa-heart"></i> {% trans "ÜRÜN GARANTİSİ" %}</span>
       </div>
+
     </div>
   </div>
   {% endif %}
 
-  <!-- ۳. Mobile Sidebar -->
+  <!-- 3. Mobil kenar çubuğu -->
   <nav class="mobile-sidebar" data-navbar>
     <div class="sidebar-header">
       <a href="{% url 'core:home' %}" class="sidebar-logo">
-        <i class="fa-solid fa-leaf"></i>
+        <img src="{% static 'src/img/logo.svg' %}" alt="" class="site-logo site-logo-sidebar" aria-hidden="true">
         <div class="logo-text">
-          <span class="brand-name">ÇİÇEK</span>
-          <span class="brand-sub">DEPOSU</span>
+          <span class="logo-wordmark-name">ASPIZ</span>
+          <span class="logo-wordmark-sub">FLOWERS</span>
         </div>
       </a>
-      <button class="nav-close-btn" type="button" aria-label="{% trans 'close menu' %}" data-nav-toggler>
+      <button class="nav-close-btn" type="button" aria-label="{% trans 'Menüyü kapat' %}" data-nav-toggler>
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
     <div class="sidebar-content">
-      <form class="sidebar-search" action="{% url 'products:list' %}" method="get" data-search-container autocomplete="off">
+      <form class="sidebar-search" action="{% url 'products:list' %}" method="get" data-search-container
+        autocomplete="off">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input type="text" name="q" value="{{ request.GET.q }}" data-search-input
           placeholder="{% trans 'Aradığınız ürünün adını yazınız...' %}" autocomplete="off">
@@ -115,8 +124,10 @@
           <li><a href="{% url 'orders:history' %}">{% trans "Siparişlerim" %}</a></li>
           <li><a href="{% url 'accounts:profile' %}">{% trans "Hesabım" %}</a></li>
           {% else %}
-          <li><button type="button" class="sidebar-link-btn" data-login-open="login">{% trans "Giriş Yap" %}</button></li>
-          <li><button type="button" class="sidebar-link-btn" data-login-open="register">{% trans "Kayıt Ol" %}</button></li>
+          <li><button type="button" class="sidebar-link-btn" data-login-open="login">{% trans "Giriş Yap" %}</button>
+          </li>
+          <li><button type="button" class="sidebar-link-btn" data-login-open="register">{% trans "Kayıt Ol" %}</button>
+          </li>
           {% endif %}
         </ul>
       </div>
@@ -137,7 +148,9 @@
             <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
             <div class="contact-info">
               <strong>{% trans "Adres" %}</strong>
-              <p>{% trans "[Mağaza / depo adresinizi buraya yazın]" %}</p>
+              <p><a href="https://maps.app.goo.gl/ConU9qCUPpM8Uyvv5?g_st=ac" target="_blank"
+                  rel="noopener noreferrer">Mahmutbey, 2433. Sokak İSTOÇ Toptancılar Çarşısı D:15.Ada No : 32, 34218
+                  Bağcılar/İstanbul, Türkiye</a></p>
             </div>
           </div>
           <div class="contact-item">
@@ -152,11 +165,12 @@
     </div>
 
     <div class="sidebar-footer">
-      <a href="#" class="instagram-link">
+      <a href="https://www.instagram.com/toptan.yapay_cicek/" target="_blank" rel="noopener noreferrer"
+        class="instagram-link">
         <div class="icon-box-sm"><i class="fa-brands fa-instagram"></i></div>
         <span>INSTAGRAM</span>
       </a>
-      <p class="copyright-text">&copy; {% now "Y" %} {% trans "Yapay Çiçek Deposu" %}</p>
+      <p class="copyright-text">&copy; {% now "Y" %} {% trans "ASPIZ FLOWERS" %}</p>
     </div>
   </nav>
   {% if nav_categories %}
@@ -176,7 +190,8 @@
   <div class="category-slider">
     <div class="container">
       <button class="slider-btn prev" type="button" data-slider-prev><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="slider-track" data-slider-track>
+      <div class="slider-track" data-slider-track tabindex="0" role="region"
+        aria-label="{% trans 'Ürünler arasında gezinme' %}">
         {% for product in featured_products %}
         <a href="{{ product.get_absolute_url }}" class="cat-item">
           <div class="img-box">

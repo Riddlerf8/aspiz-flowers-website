@@ -137,7 +137,7 @@ TIME_ZONE = "Europe/Istanbul"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -155,7 +155,7 @@ STORAGES = {
     },
 }
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Serve user-uploaded product/category photos even with DEBUG=False.
@@ -189,7 +189,7 @@ if os.getenv("BEHIND_PROXY", "False") == "True":
 
 # CSRF_TRUSTED_ORIGINS is required by Django when the site is served over
 # HTTPS behind a proxy/CDN on a real domain. Comma-separated full origins,
-# e.g. CSRF_TRUSTED_ORIGINS=https://cicekdeposu.com,https://www.cicekdeposu.com
+# e.g. CSRF_TRUSTED_ORIGINS=https://a.com,https://www.cicekdeposu.com
 _csrf_trusted = os.getenv("CSRF_TRUSTED_ORIGINS", "")
 if _csrf_trusted:
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_trusted.split(",") if origin.strip()]
@@ -219,11 +219,15 @@ WHATSAPP_TEMPLATE_LANGUAGE = os.getenv("WHATSAPP_TEMPLATE_LANGUAGE", "tr")
 # domain in production, e.g. https://cicekdeposu.com
 SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8000")
 
-# --- Email (used for "şifremi unuttum" password reset) ---
+# --- Email (used for "şifremi unuttum" password reset AND the email login
+# codes sent by accounts.views.request_login_code_view) ---
 # If EMAIL_HOST/EMAIL_HOST_USER/EMAIL_HOST_PASSWORD aren't all set yet
 # (waiting on real SMTP credentials), fall back to Django's console backend
-# — password reset emails print to the server log instead of erroring out,
-# so the rest of the site keeps working while SMTP isn't configured yet.
+# — those emails print to the server log instead of erroring out, so the
+# rest of the site keeps working while SMTP isn't configured yet. This
+# means login codes won't reach real inboxes until EMAIL_HOST/USER/PASSWORD
+# are set in .env — check `python manage.py runserver`'s console output to
+# grab a code while testing.
 # See .env.example for where to get these from your email provider.
 _email_configured = all([
     os.getenv("EMAIL_HOST"),
@@ -241,7 +245,7 @@ if _email_configured:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@cicekdeposu.com")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@aspizflowers.com")
 
 # Password reset links expire after this long (Django default is 3 days;
 # kept explicit here so it's easy to find/tune).

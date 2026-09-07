@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Kodu Doğrula - Çiçek Deposu{% endblock %}
+
+{% block content %}
+  <div class="auth-page">
+    <span class="page-kicker" style="display: block; text-align: center;">Aspiz Flowers</span>
+    <h1 class="page-title" style="text-align: center;">Kodunuzu Girin</h1>
+    <div class="page-rule" style="margin-inline: auto;"></div>
+
+    <div class="account-card">
+      <p class="auth-note" style="margin-top: 0;">
+        <strong>{{ email }}</strong> adresine 6 haneli bir giriş kodu gönderdik.
+        Kod 10 dakika boyunca geçerlidir.
+      </p>
+
+      <form method="post" class="account-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="{{ form.code.id_for_label }}">{{ form.code.label }}</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-key field-icon"></i>
+            {{ form.code }}
+          </div>
+          {% for error in form.code.errors %}
+            <span class="error-message">{{ error }}</span>
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <span class="error-message">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="login-btn">
+          <span class="btn-label">Giriş Yap</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <form method="post" action="{% url 'accounts:login_resend' %}" style="margin-top: 1rem; text-align: center;">
+        {% csrf_token %}
+        <button type="submit" class="inline-link" style="background: none; border: none; padding: 0; cursor: pointer;">
+          Kodu tekrar gönder
+        </button>
+      </form>
+    </div>
+
+    <p class="auth-note">
+      <a href="{% url 'accounts:login' %}">Farklı bir hesapla giriş yap</a>
+    </p>
+  </div>
+{% endblock %}
