@@ -274,30 +274,6 @@ The repository is treated as the project's **living source of truth**, allowing 
 
 ---
 
-## 🖼️ Preview
-
-### Homepage
-
-_Add screenshot here._
-
-### Products
-
-_Add screenshot here._
-
-### Product Details
-
-_Add screenshot here._
-
-### Shopping Cart
-
-_Add screenshot here._
-
-### Admin Panel
-
-_Add screenshot here._
-
----
-
 ## 👥 Project Team
 
 ### 👑 Team Lead
