@@ -1,118 +1,398 @@
-# Shop Project (Django + MySQL + Tailwind)
+# 🌸 Aspiz Flowers
 
-Yapay Çiçek Depso online store — a complete project featuring authentication, a
-database-backed shopping cart, tiered (wholesale) pricing, automatic inventory
-management, WhatsApp notifications for new orders, and an admin panel.
+> A complete e-commerce platform developed for **Aspiz Flowers**, providing a modern online shopping experience with product management, shopping cart functionality, order management, authentication, inventory management, and WhatsApp Business integration.
 
-## Quick Start (Windows)
+**🌐 Live Website:** [https://aspizflowers.com](https://aspizflowers.com)
 
-```powershell
+**📌 Status:** `Completed`
+
+---
+
+## 📖 About The Project
+
+**Aspiz Flowers** is a full-stack e-commerce website built for a real-world flower business.
+
+The project was developed to provide customers with a simple and modern way to browse products, manage their shopping cart, and place orders online, while providing the business with the tools required to manage products, inventory, customers, and orders.
+
+The platform combines a **Django backend**, **MySQL database**, **Tailwind CSS frontend**, and **WhatsApp Business Cloud API** integration into a complete production-ready web application.
+
+---
+
+## ✨ Features
+
+### 🛍️ E-Commerce
+
+- Product catalog
+- Product categories
+- Product detail pages
+- Shopping cart
+- Cart quantity management
+- Customer accounts
+- Authentication
+- Order creation
+- Order management
+- Inventory management
+- Automatic inventory updates
+- Tiered / wholesale pricing
+
+### 👤 User Management
+
+- User registration
+- User login / logout
+- Customer accounts
+- Protected user functionality
+- Administrative access
+
+### 📦 Order Management
+
+- Database-backed orders
+- Customer order information
+- Ordered products and quantities
+- Order totals
+- Order status management
+- Administrative order management
+
+### 📱 WhatsApp Integration
+
+The platform integrates with the **WhatsApp Business Cloud API** to connect the website's order workflow with the business's WhatsApp communication system.
+
+### ⚙️ Administration
+
+The administrative system allows the business to manage:
+
+- Products
+- Categories
+- Inventory
+- Pricing
+- Orders
+- Customers
+- Store data
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Python / Django |
+| Frontend | HTML / Tailwind CSS / JavaScript |
+| Database | MySQL |
+| API | WhatsApp Business Cloud API |
+| Containerization | Docker |
+| Web Server | Nginx |
+| Hosting | Linux VPS |
+| Version Control | Git / GitHub |
+
+---
+
+## 🏗️ Project Structure
+
+```text
+aspiz-flowers-website/
+│
+├── website/
+│   ├── aspiz_flowers/
+│   │   ├── settings/
+│   │   ├── urls.py
+│   │   └── ...
+│   │
+│   ├── templates/
+│   ├── static/
+│   ├── media/
+│   ├── manage.py
+│   └── requirements.txt
+│
+├── Dockerfile
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+```
+
+The project follows a modular Django architecture, keeping application logic, templates, static assets, configuration, and deployment-related files separated.
+
+---
+
+## 🚀 Development Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Riddlerf8/aspiz-flowers-website.git
+cd aspiz-flowers-website
+```
+
+### 2. Create a virtual environment
+
+```bash
 python -m venv venv
+```
+
+Activate it:
+
+**Windows**
+
+```bash
 venv\Scripts\activate
-pip install -r requirements.txt
 ```
 
-> Installing MySQL on Windows is no longer a hassle — the project uses **PyMySQL**
-> (a pure-Python package) instead of `mysqlclient`, so `pip install` works without
-> requiring a compiler or Visual Studio.
+**Linux / macOS**
 
-```powershell
-copy .env.example .env            # fill in the values (SECRET_KEY, DB_*, WHATSAPP_*)
+```bash
+source venv/bin/activate
 ```
 
-Create a MySQL database (using the `utf8mb4` character set for proper support of
-Turkish/Persian characters):
+### 3. Install dependencies
 
-If you haven't installed MySQL Server yet, install it via the
-[MySQL Installer for Windows](https://dev.mysql.com/downloads/installer/), or if you
-already have XAMPP/Laragon, the bundled MySQL/MariaDB is sufficient. Once installed,
-run the following command using **MySQL Workbench** or **Command Prompt** (if you've
-added `mysql` to your PATH):
-
-```sql
-CREATE DATABASE shop_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```bash
+pip install -r website/requirements.txt
 ```
 
-```powershell
-npm install
-npm run build:css                 # or npm run watch:css during development
+### 4. Configure the environment
 
+Create the local environment file:
+
+```bash
+cp website/.env.example website/.env
+```
+
+Then configure the required values.
+
+> ⚠️ Environment variables are required for local and production configuration. See `.env.example` for the required configuration. Sensitive credentials are not included in the repository.
+
+### 5. Run migrations
+
+```bash
+cd website
 python manage.py migrate
+```
+
+### 6. Create an administrator
+
+```bash
 python manage.py createsuperuser
+```
+
+### 7. Start the development server
+
+```bash
 python manage.py runserver
 ```
 
-Then visit `http://127.0.0.1:8000`, and the admin panel at
-`http://127.0.0.1:8000/admin/`.
+The application will be available at:
 
-## WhatsApp Integration (WhatsApp Business Cloud API)
+```text
+http://127.0.0.1:8000
+```
 
-Whenever a customer completes checkout, an automatic message is sent to the store's
-WhatsApp number containing the order number, customer name, total amount, and a
-direct link to that order's page in the admin panel.
+---
 
-**One-time setup (complete these steps in Meta Business Manager before this will work):**
+## 🐳 Docker
 
-1. Create/verify a WhatsApp Business Account and phone number: https://business.facebook.com
-2. In WhatsApp Manager, under **Message Templates**, create a new template with the
-   name you set in `.env` (default: `new_order_alert`), set its category to
-   `Utility`, and use the following body text (exactly as shown, with 4 placeholders):
-   ```
-   New order #{{1}} from {{2}} — total {{3}} TRY. Details: {{4}}
-   ```
-   Then submit it for Meta approval (this usually takes anywhere from a few minutes
-   to a full day).
-3. Fill in the following values in `.env`:
-   - `WHATSAPP_PHONE_NUMBER_ID` — from the API Setup page of the Meta app
-   - `WHATSAPP_ACCESS_TOKEN` — generate a **permanent token** (not the 24-hour
-     temporary token)
-   - `WHATSAPP_ADMIN_PHONE` — the WhatsApp number that should receive notifications,
-     in international format without a `+` (e.g., `905XXXXXXXXX`)
-   - `SITE_BASE_URL` — the site's real domain (used for the link inside the message)
+Docker configuration is included in the project for containerized development and deployment.
 
-If sending the message fails for any reason (invalid token, template not yet
-approved, network outage, etc.), **the order is still placed successfully** — only
-the "Whatsapp notified" column for that order remains `False` in the admin panel,
-and you can retry it at any time using the **"Resend WhatsApp notification"** action
-in the order list.
+Build and start the containers:
 
-## What's Completed
+```bash
+docker compose up --build
+```
 
-- **accounts** — custom user model (phone/address), registration, login, logout,
-  profile
-- **products** — listing, categories, product details, search, pagination
-- **cart** — database-backed shopping cart (for both logged-in and guest users),
-  automatic guest-cart merging on login, automatic tiered pricing based on quantity
-- **orders** — checkout, order history, order cancellation (with automatic
-  inventory restoration), **automatic WhatsApp notification for new orders**
-- Inventory deduction/restoration using row locking (`select_for_update`) to
-  prevent overselling on concurrent orders
-- Responsive Tailwind templates (header, footer, product cards, etc.)
+Run in detached mode:
 
-## Important Technical Notes
+```bash
+docker compose up -d --build
+```
 
-- `AUTH_USER_MODEL = "accounts.User"` — set before the first migration (difficult
-  to change later)
-- The shopping cart works for both guest users (session-based) and logged-in
-  users; carts are merged automatically on login
-- The site language (customer-facing text, order status, etc.) is **Turkish**; the
-  admin panel at `/admin/` is always displayed in **English** independently
-  (`config/middleware.py: AdminLanguageMiddleware`), regardless of the overall
-  `LANGUAGE_CODE` setting. Note: a few choice labels shared between the admin panel
-  and customer-facing pages (such as order status "Kargoda" and product badges)
-  were intentionally left in Turkish, since customers see that same field.
-- For production, be sure to set `DEBUG=False` and a long, randomly generated
-  `SECRET_KEY` — with `DEBUG=False`, security settings (`SECURE_SSL_REDIRECT`,
-  `SESSION_COOKIE_SECURE`, HSTS) are enabled automatically.
+Stop the containers:
 
-## Changelog
+```bash
+docker compose down
+```
 
-| # | Change | Reason |
-|---|---|---|
-| 1 | Database switched from PostgreSQL to **MySQL**, using **PyMySQL** (not `mysqlclient`) so it installs on Windows without a compiler | Explicit project requirement + Windows OS |
-| 2 | Full **WhatsApp Business Cloud API** integration added to the checkout flow | The project's most important feature, previously nonexistent |
-| 3 | Added `whatsapp_notified` field + "Resend WhatsApp notification" admin action | So an order isn't lost if message sending fails |
-| 4 | Admin panel in English, customer-facing site in Turkish (`AdminLanguageMiddleware`) | Explicit requirement |
-| 5 | Removed the "Wishlist" button | The button had no backend/JavaScript behind it; clicking it did nothing |
-| 6 | The cart context processor no longer creates a Cart/Session row for every anonymous visit | Prevents unnecessary database growth under high traffic |
-| 7 | Production security settings (`SECURE_SSL_REDIRECT`, etc.) enabled when `DEBUG=False` | Preparation for a real production launch |
+---
+
+## 🌍 Deployment
+
+The website is deployed on a **Linux VPS** and served through **Nginx**.
+
+Production architecture:
+
+```text
+                    GitHub
+                       │
+                       ▼
+                 Linux VPS
+                       │
+                       ▼
+                    Docker
+                       │
+                       ▼
+                   Django
+                       │
+                 ┌─────┴─────┐
+                 ▼           ▼
+              MySQL      WhatsApp API
+                 │
+                 ▼
+                Nginx
+                 │
+                 ▼
+       https://aspizflowers.com
+```
+
+The production environment is kept separate from development configuration, with sensitive credentials stored outside the repository.
+
+---
+
+## 🔄 Project Workflow
+
+```text
+Development
+     │
+     ▼
+   Git
+     │
+     ▼
+  GitHub
+     │
+     ▼
+Production VPS
+     │
+     ▼
+   Docker
+     │
+     ▼
+   Django
+     │
+     ▼
+   Nginx
+     │
+     ▼
+aspizflowers.com
+```
+
+The repository is treated as the project's **living source of truth**, allowing future development and deployment changes to be tracked through Git.
+
+---
+
+## 🖼️ Preview
+
+### Homepage
+
+_Add screenshot here._
+
+### Products
+
+_Add screenshot here._
+
+### Product Details
+
+_Add screenshot here._
+
+### Shopping Cart
+
+_Add screenshot here._
+
+### Admin Panel
+
+_Add screenshot here._
+
+---
+
+## 👥 Project Team
+
+### 👑 Team Lead
+
+**Sepehr Abolhasan**
+
+Project leadership, architecture, development coordination, deployment, and technical direction.
+
+### 💻 Development
+
+**Eileen Ramezani**
+
+Development and implementation contributions.
+
+### 🛠️ Support
+
+**Hesam Zaretavakoli**
+
+Project support and operational assistance.
+
+### 🛡️ Security
+
+**Sepehr Abolhasan**
+
+Application security and security considerations.
+
+---
+
+## 📊 Project Information
+
+| Information | Details |
+|---|---|
+| Project | Aspiz Flowers |
+| Type | E-Commerce Platform |
+| Status | Completed |
+| Backend | Django |
+| Programming Language | Python |
+| Frontend | Tailwind CSS |
+| Database | MySQL |
+| API Integration | WhatsApp Business Cloud API |
+| Containerization | Docker |
+| Web Server | Nginx |
+| Hosting | Linux VPS |
+| Source Control | Git / GitHub |
+| Live Website | https://aspizflowers.com |
+
+---
+
+## 🔮 Future Development
+
+Although the current project is completed, the repository can continue to evolve with future maintenance and improvements.
+
+Potential future updates include:
+
+- UI/UX improvements
+- Performance optimization
+- Additional e-commerce functionality
+- Improved order management
+- Additional WhatsApp functionality
+- Enhanced monitoring and logging
+- Security improvements
+- Deployment automation
+
+---
+
+## 🔒 Project Scope
+
+**Aspiz Flowers is maintained as a separate real-world development project.**
+
+This repository is **not part of my cybersecurity portfolio**.
+
+Cybersecurity research, Web Security Academy labs, penetration-testing exercises, vulnerability research, and related write-ups are maintained separately.
+
+This repository focuses exclusively on the development, deployment, and maintenance of the **Aspiz Flowers e-commerce platform**.
+
+---
+
+## 📜 Copyright
+
+© 2026 **Aspiz Flowers**
+
+Developed by **Sepehr Abolhasan and the project team**.
+
+The project's source code, branding, visual assets, product information, and other proprietary materials are intended for the Aspiz Flowers project and may not be reused, redistributed, or commercially reproduced without appropriate permission.
+
+---
+
+## 🔗 Links   
+
+🌐 **Live Website**  
+https://aspizflowers.com
+
+💻 **GitHub Repository**  
+https://github.com/Riddlerf8/aspiz-flowers-website
+
+---
+
+> **Aspiz Flowers — Built for the real world. 🌸**
