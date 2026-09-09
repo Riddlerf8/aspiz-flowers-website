@@ -290,7 +290,7 @@ Development and implementation contributions.
 
 ### 🛠️ Support
 
-**Hesam Zaretavakoli**
+**Hesam Zaretavakkoli**
 
 Project support and operational assistance.
 
