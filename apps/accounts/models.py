@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -19,3 +20,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.get_full_name() or self.username
+
+
+class LoginCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="login_codes")
+    code_hash = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @property
+    def is_valid(self):
+        return self.used_at is None and timezone.now() < self.expires_at and self.attempts < 5

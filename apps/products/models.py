@@ -29,7 +29,7 @@ def turkish_slugify(value):
 def validate_image_size(file):
     limit_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if file.size > limit_bytes:
-        raise ValidationError(f"حجم عکس نباید بیشتر از {MAX_UPLOAD_MB} مگابایت باشد.")
+        raise ValidationError(f"Görsel boyutu {MAX_UPLOAD_MB} MB'den fazla olamaz.")
 
 
 class Category(models.Model):
@@ -53,7 +53,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     class Badge(models.TextChoices):
-        NONE = "none", "بدون بج"
+        NONE = "none", "Rozet yok"
         EDITOR_CHOICE = "editor", "Editörün Seçimi"
         NEW_SEASON = "new", "Yeni Sezon"
         DEAL = "deal", "Fırsat"
@@ -215,7 +215,7 @@ class ProductImage(models.Model):
         200-300 products that's 1-3GB of storage and, worse, every one of
         those full-size files gets served straight to visitors' phones on
         the product grid. This downsizes to MAX_DIMENSION on the longest
-        side and re-encodes as JPEG at quality 82, which in practice takes
+        side and re-encodes as WEBP at quality 82, which in practice takes
         a ~6MB photo down to ~200-400KB with no visible quality loss on
         screen. Runs once, at upload time, so it costs nothing later.
         """
@@ -227,11 +227,11 @@ class ProductImage(models.Model):
         img.thumbnail((MAX_DIMENSION, MAX_DIMENSION), Image.LANCZOS)
 
         buffer = io.BytesIO()
-        img.save(buffer, format="JPEG", quality=82, optimize=True)
+        img.save(buffer, format="WEBP", quality=82, method=6)
         buffer.seek(0)
 
         original_name = self.image.name.rsplit(".", 1)[0]
-        self.image = ContentFile(buffer.read(), name=f"{original_name}.jpg")
+        self.image = ContentFile(buffer.read(), name=f"{original_name}.webp")
 
     def save(self, *args, **kwargs):
         if self.image and self._state.adding:
@@ -278,7 +278,7 @@ class PriceTier(models.Model):
                 product=self.product, min_quantity__gt=self.min_quantity
             ).exclude(pk=self.pk).exclude(price__isnull=True)
             if higher_tiers.filter(price__gte=self.price).exists():
-                raise ValidationError("قیمت پله‌های بالاتر باید کمتر یا مساوی این پله باشد.")
+                raise ValidationError("Daha yüksek kademelerin fiyatı bu kademeye eşit veya daha düşük olmalıdır.")
 
         # A contact-only ("DM") tier only makes sense as the highest-quantity
         # tier — every lower tier must still have a real, checkout-usable price.
@@ -287,10 +287,10 @@ class PriceTier(models.Model):
                 product=self.product, min_quantity__lt=self.min_quantity, price__isnull=True
             ).exclude(pk=self.pk)
             if lower_tiers_without_price.exists():
-                raise ValidationError("سبد قیمت فقط برای بالاترین پله (بیشترین حداقل تعداد) می‌تواند خالی (DM) باشد.")
+                raise ValidationError("Fiyat tablosunda yalnızca en yüksek kademe (en yüksek minimum miktar) boş (DM) bırakılabilir.")
         else:
             higher_contact_tiers = PriceTier.objects.filter(
                 product=self.product, min_quantity__gt=self.min_quantity, price__isnull=True
             ).exclude(pk=self.pk)
             if higher_contact_tiers.exists():
-                raise ValidationError("پله DM باید بالاترین پله (بیشترین حداقل تعداد) باشد.")
+                raise ValidationError("DM kademesi en yüksek kademe (en yüksek minimum miktar) olmalıdır.")

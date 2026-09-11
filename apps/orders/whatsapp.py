@@ -29,6 +29,7 @@ normally and the order is saved — we log the failure and flag the order so
 staff can notice it in /admin/ and hit "Resend WhatsApp notification".
 """
 import logging
+from urllib.parse import quote
 
 import requests
 from django.conf import settings
@@ -43,6 +44,53 @@ def _order_summary_line(order):
     if remaining > 0:
         summary += f" +{remaining} more"
     return summary or "-"
+
+
+def build_order_whatsapp_text(order):
+    """
+    Builds the full, human-readable cart/order text sent to the shop's
+    WhatsApp. Unlike the Business Cloud API template above (which needs a
+    pre-approved template and can only hold 4 short placeholders), this is
+    a normal free-form message opened by the CUSTOMER's own WhatsApp app —
+    so there's no template restriction and every cart line can be listed.
+    """
+    customer_name = order.user.get_full_name() or order.user.username
+    lines = [f"Yeni Sipariş Talebi - Sipariş No: #{order.pk}", "", f"Müşteri: {customer_name}"]
+
+    if order.user.phone:
+        lines.append(f"Telefon: {order.user.phone}")
+    if order.user.address:
+        lines.append(f"Adres: {order.user.address}")
+
+    lines.append("")
+    lines.append("Sepet:")
+    for item in order.items.select_related("product"):
+        lines.append(f"- {item.quantity} x {item.product.name} = {item.line_total} TL")
+
+    lines.append("")
+    lines.append(f"Toplam: {order.total} TL")
+    lines.append("Sipariş detayı: https://www.aspizflowers.com")
+
+    return "\n".join(lines)
+
+
+def get_customer_whatsapp_link(order):
+    """
+    Returns a https://wa.me/<number>?text=<cart> link that opens the
+    CUSTOMER's own WhatsApp app with the full cart pre-filled, addressed to
+    the shop's admin number. Because the customer sends this themselves,
+    WhatsApp's 24-hour "customer service window" opens immediately and the
+    admin can just reply in that same chat — no Business API approval,
+    template, or token needed. Returns None if no admin number is
+    configured (e.g. in local dev / .env not filled in), and the caller is
+    expected to hide the button in that case.
+    """
+    admin_phone = "".join(ch for ch in (settings.WHATSAPP_ADMIN_PHONE or "") if ch.isdigit())
+    if not admin_phone:
+        return None
+
+    text = build_order_whatsapp_text(order)
+    return f"https://wa.me/{admin_phone}?text={quote(text)}"
 
 
 def send_order_notification(order):

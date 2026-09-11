@@ -1,27 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Kayıt Ol - Çiçek Deposu{% endblock %}
 {% block content %}
-  <div class="max-w-sm mx-auto bg-white dark:bg-[#1c1c1c] rounded-2xl border border-cream-200 dark:border-white/10 p-6">
-    <h1 class="font-serif text-xl text-wine-900 dark:text-[#f5f3ef] mb-6 text-center">Kayıt Ol</h1>
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ next|default:'' }}">
-      {% for field in form %}
-        <div>
-          <label class="block text-xs text-wine-500 dark:text-[#a39c8f] mb-1">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<p class="text-[11px] text-wine-300 dark:text-[#8a7355] mt-1">{{ field.help_text }}</p>{% endif %}
+  <div class="auth-page">
+    <span class="page-kicker" style="display: block; text-align: center;">Aspiz Flowers</span>
+    <h1 class="page-title" style="text-align: center;">Kayıt Ol</h1>
+    <div class="page-rule" style="margin-inline: auto;"></div>
+
+    <div class="account-card">
+      <form method="post" class="account-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next|default:'' }}">
+
+        {% for field in form %}
+          {% if field.name == "terms" %}
+            <label class="remember-row" style="align-items: flex-start;">
+              {{ field }}
+              <span>{{ field.label }}</span>
+            </label>
+          {% else %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              <div class="input-with-icon">
+                {% if field.name == "full_name" %}
+                  <i class="fa-regular fa-user field-icon"></i>
+                {% elif field.name == "email" %}
+                  <i class="fa-regular fa-envelope field-icon"></i>
+                {% elif field.name == "phone" %}
+                  <i class="fa-solid fa-phone field-icon"></i>
+                {% else %}
+                  <i class="fa-solid fa-lock field-icon"></i>
+                {% endif %}
+                {{ field }}
+              </div>
+              {% if field.help_text %}
+                <span style="font-size: .75rem; color: var(--text-muted);">{{ field.help_text }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
           {% for error in field.errors %}
-            <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+            <span class="error-message">{{ error }}</span>
           {% endfor %}
-        </div>
-      {% endfor %}
-      <button type="submit" class="w-full rounded-pill bg-orange-500 hover:bg-orange-600 text-white py-2.5 font-medium">
-        Kayıt Ol
-      </button>
-    </form>
-    <p class="text-center text-sm text-wine-400 dark:text-[#a39c8f] mt-4">
-      Zaten hesabınız var mı? <a href="{% url 'accounts:login' %}" class="text-wine-700 dark:text-[#e8dfc8] underline">Giriş yapın</a>
+        {% endfor %}
+
+        {% for error in form.non_field_errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+
+        <button type="submit" class="login-btn">
+          <span class="btn-label">Kayıt Ol</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+
+    <p class="auth-note">
+      Zaten hesabınız var mı? <a href="{% url 'accounts:login' %}">Giriş yapın</a>
     </p>
   </div>
 {% endblock %}

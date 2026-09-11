@@ -79,14 +79,14 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   outline-offset: 2px;
 }
 
-/* تنظیم عرض استاندارد و جلوگیری از چسبیدن در حالت 100% */
+/* Standart genişliği ayarla ve %100 modunda yapışmayı önle */
 .container {
   width: 100%;
-  max-width: 1200px !important; /* یا 1200px بسته به سلیقه‌ت */
+  max-width: 1200px !important; /* tercihe göre 1200px de kullanılabilir */
   margin-left: auto !important;
   margin-right: auto !important;
-  padding-left: 1.5rem !important;  /* ایجاد فاصله ۳۲ پیکسلی از دیوار چپ */
-  padding-right: 1.5rem !important; /* ایجاد فاصله ۳۲ پیکسلی از دیوار راست */
+  padding-left: 1.5rem !important;  /* sol kenardan 32 piksel boşluk */
+  padding-right: 1.5rem !important; /* sağ kenardan 32 piksel boşluk */
   box-sizing: border-box !important;
 }
 
@@ -213,6 +213,18 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   color: #f5eaee;
   margin: 0;
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.top-banner-subtitle {
+  max-width: 620px;
+  margin: 18px auto 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: rgba(245, 234, 238, 0.86);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
 }
 
 .top-banner-actions {
@@ -359,20 +371,53 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 
 .logo-area {
-  font-family: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 1.375rem;
-  font-weight: 500;
   color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: 0.5px;
 }
 
 .logo-area i {
   color: var(--accent-gold);
   font-size: 0.85em;
+}
+
+.site-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.site-logo-header {
+  width: 34px;
+  height: 34px;
+}
+
+.logo-wordmark {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+  text-align: left;
+}
+
+.logo-wordmark-name {
+  font-family: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: .2px;
+  color: currentColor;
+}
+
+.logo-wordmark-sub {
+  margin-top: 3px;
+  color: var(--accent-gold);
+  font-family: 'Inter', sans-serif;
+  font-size: .56rem;
+  font-weight: 600;
+  letter-spacing: 2.2px;
 }
 
 .search-box {
@@ -781,24 +826,14 @@ html.dark-mode .moon-icon { display: none; }
   color: var(--accent-gold);
 }
 
+.site-logo-sidebar {
+  width: 40px;
+  height: 40px;
+}
+
 .logo-text {
   display: flex;
   flex-direction: column;
-}
-
-.brand-name {
-  font-family: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 1.125rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  line-height: 1;
-}
-
-.brand-sub {
-  font-size: 0.625rem;
-  color: var(--text-muted);
-  letter-spacing: 1px;
 }
 
 .nav-close-btn {
@@ -1195,6 +1230,13 @@ html.dark-mode .glass-floating-oval .search-box {
     line-height: 1.2;
   }
 
+  .top-banner-subtitle {
+    max-width: 340px;
+    margin-top: 12px;
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
   .main-header-wrapper {
     top: 0;
   }
@@ -1292,31 +1334,19 @@ html.dark-mode .glass-floating-oval .search-box {
    7. LOGIN & CART MODAL COMPONENTS
    ========================================================================== */
 .login-modal {
-  --login-bg-main: #fbf5f2;
-  --login-bg-card: rgba(184, 146, 90, 0.1);
-  --login-text-main: #2a151d;
-  --login-text-muted: #8a6f78;
-  --login-accent-primary: #b8925a;
-  --login-accent-hover: #8c2a4b;
-  --login-accent-secondary: #b8925a;
-  --login-border-color: rgba(184, 146, 90, 0.3);
-  --login-radius-sm: 2px;
-  --login-radius-md: 4px;
-  --login-radius-pill: 2px;
-  --login-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.35);
-  --login-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-html.dark-mode .login-modal {
-  --login-bg-main: #170a0f;
-  --login-bg-card: #1c0e14;
-  --login-text-main: #f5eaee;
-  --login-text-muted: #b898a5;
-  --login-accent-primary: #c9a768;
-  --login-accent-hover: #e6d3ab;
-  --login-accent-secondary: #c9a768;
-  --login-border-color: rgba(201, 167, 104, 0.22);
-  --login-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.7);
+  --login-bg-main: var(--bg-main);
+  --login-bg-card: var(--bg-card);
+  --login-text-main: var(--text-main);
+  --login-text-muted: var(--text-muted);
+  --login-accent-primary: var(--accent-gold);
+  --login-accent-hover: var(--accent-plum);
+  --login-accent-secondary: var(--accent-gold);
+  --login-border-color: var(--border-color);
+  --login-radius-sm: var(--radius-sm);
+  --login-radius-md: var(--radius-md);
+  --login-radius-pill: var(--radius-pill);
+  --login-shadow-lg: var(--shadow-lg);
+  --login-transition: var(--transition);
 }
 
 .login-modal {
@@ -1414,18 +1444,24 @@ html.dark-mode .login-modal {
   gap: 0.6rem;
 }
 
-.brand-logo-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.brand-logo-lockup {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.375rem;
-  color: var(--login-accent-primary);
+  gap: 12px;
   margin-bottom: 0.75rem;
+}
+
+.site-logo-auth {
+  width: 38px;
+  height: 38px;
+}
+
+.login-brand-panel .logo-wordmark-name {
+  color: #fff;
+}
+
+.login-brand-panel .logo-wordmark-sub {
+  color: var(--accent-gold);
 }
 
 .brand-panel-center h2 {
@@ -1433,14 +1469,6 @@ html.dark-mode .login-modal {
   font-style: italic;
   font-size: 2.1rem;
   font-weight: 500;
-}
-
-.brand-panel-sub {
-  color: var(--login-accent-primary);
-  text-transform: uppercase;
-  font-size: 0.8125rem;
-  letter-spacing: 1.5px;
-  font-weight: 600;
 }
 
 .brand-panel-desc {
@@ -1589,6 +1617,14 @@ html.dark-mode .form-group input[type="text"] {
   background-color: rgba(0, 0, 0, 0.25);
 }
 
+.form-group .input-with-icon input {
+  padding-inline-start: 2.75rem;
+}
+
+.form-group .input-with-icon:has(.password-toggle-btn) input {
+  padding-inline-end: 2.75rem;
+}
+
 .form-group input:focus {
   border-color: var(--login-accent-primary);
   box-shadow: 0 0 0 3px rgba(217, 127, 136, 0.25);
@@ -1636,18 +1672,53 @@ html.dark-mode .form-group input[type="text"] {
 .remember-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  width: 100%;
+  gap: 1rem;
   font-size: 0.8125rem;
   color: var(--login-text-muted);
   cursor: pointer;
 }
 
 .remember-row input[type="checkbox"] {
-  accent-color: var(--login-accent-secondary);
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: grid;
+  place-content: center;
+  width: 16px !important;
+  min-width: 16px;
+  height: 16px !important;
+  min-height: 16px;
+  padding: 0 !important;
+  margin: 0;
+  border: 1px solid var(--accent-gold);
+  border-radius: 4px;
+  background: var(--bg-card);
   cursor: pointer;
-  flex-shrink: 0;
+  flex: 0 0 16px;
+  transition: var(--transition);
+}
+
+.remember-row input[type="checkbox"]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  border-radius: 2px;
+  background: var(--accent-gold);
+  transition: transform 0.15s ease;
+}
+
+.remember-row input[type="checkbox"]:checked {
+  border-color: var(--accent-plum);
+  background: var(--accent-plum);
+}
+
+.remember-row input[type="checkbox"]:checked::before {
+  transform: scale(1);
+  background: #f5eaee;
 }
 
 .login-btn {
@@ -2059,24 +2130,19 @@ html.dark-mode .form-group input[type="text"] {
   color: var(--accent-gold);
 }
 
+.site-logo-footer {
+  width: 46px;
+  height: 46px;
+}
+
 .footer-logo-text {
   display: flex;
   flex-direction: column;
   line-height: 1.2;
 }
 
-.footer-brand-name {
-  font-family: 'Bodoni Moda', 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.35rem;
-  font-weight: 500;
+.footer-logo .logo-wordmark-name {
   color: var(--text-nav);
-}
-
-.footer-brand-sub {
-  font-size: 0.65rem;
-  letter-spacing: 2.5px;
-  color: var(--accent-gold);
 }
 
 .footer-desc {
@@ -3156,3 +3222,54 @@ html.dark-mode input:-moz-ui-autofill {
   border-color: var(--accent-plum);
   outline: none;
 }
+/* ==========================================================================
+   UNIFIED PAGE HEADER (kicker + serif title + gold rule)
+   Same pattern as the homepage hero / checkout page, reused here so the
+   product list, cart, order history and auth pages match it instead of
+   each inventing its own heading style.
+   ========================================================================== */
+.page-kicker { color: var(--accent-gold); font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; }
+.page-title { margin: .3rem 0 1.25rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 600; line-height: 1; }
+.page-rule { width: 58px; height: 2px; margin-bottom: 1.5rem; background: var(--accent-gold); }
+.page-header-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.page-header-row .page-title { margin-bottom: 0; }
+.page-header-link { font-size: .72rem; color: var(--accent-gold); text-decoration: underline; white-space: nowrap; }
+
+/* Shared list panel (cart items / order history rows) - mirrors checkout's order-panel */
+.panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 1.25rem; }
+.panel-row { display: flex; align-items: center; gap: .85rem; padding: .95rem 1.15rem; border-bottom: 1px solid var(--border-color); }
+.panel-row:last-child { border-bottom: none; }
+.panel-row:hover { background: color-mix(in srgb, var(--bg-card) 85%, var(--accent-gold) 15%); }
+.panel-empty { padding: 2.5rem 1.25rem; text-align: center; color: var(--text-muted); }
+.panel-empty i { font-size: 1.5rem; color: var(--accent-gold); margin-bottom: .65rem; display: block; }
+
+/* Reusable solid CTA button - mirrors checkout page's WhatsApp payment button */
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .9rem 1rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .76rem; transition: var(--transition); }
+.btn-primary:hover { background: var(--bg-nav); transform: translateY(-2px); }
+
+/* Cart page */
+.cart-thumb { width: 72px; height: 72px; flex-shrink: 0; overflow: hidden; background: var(--bg-main); border: 1px solid var(--border-color); }
+.cart-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cart-item-info { flex: 1; min-width: 10rem; }
+.cart-item-name { display: block; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.08rem; }
+.cart-item-unit { font-size: .85rem; color: var(--text-muted); }
+.cart-qty-form { display: flex; align-items: center; gap: .5rem; }
+.cart-qty-input { width: 4rem; padding: .35rem .45rem; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); text-align: center; }
+.cart-qty-update { font-size: .7rem; color: var(--accent-gold); text-decoration: underline; background: none; border: none; cursor: pointer; }
+.cart-line-total { min-width: 5rem; text-align: right; color: var(--accent-plum); font-size: .95rem; font-weight: 700; }
+.cart-remove-btn { color: #b4233e; background: none; border: none; cursor: pointer; font-size: .95rem; }
+.cart-total-row { display: flex; align-items: baseline; justify-content: space-between; padding: 1.25rem 1.15rem; background: var(--bg-main); font-size: .95rem; }
+.cart-total-row strong { color: var(--accent-plum); font-family: 'Inter', system-ui, sans-serif; font-size: 1.6rem; font-weight: 700; }
+.cart-empty-icon { font-size: 1.75rem; color: var(--accent-gold); margin-bottom: .7rem; display: block; }
+
+/* Order history rows */
+.history-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.history-row-id { font-weight: 700; color: var(--text-main); }
+.history-row-date { font-size: .75rem; color: var(--text-muted); margin-top: .15rem; }
+.history-row-status { font-size: .68rem; padding: .3rem .7rem; border: 1px solid var(--border-color); color: var(--accent-gold); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+.history-row-total { font-weight: 700; color: var(--accent-plum); white-space: nowrap; }
+
+/* Standalone auth pages (login / register / password reset) reuse .account-card */
+.auth-page { max-width: 440px; margin: 2.5rem auto 4rem; }
+.auth-note { text-align: center; font-size: .85rem; color: var(--text-muted); margin-top: 1.25rem; }
+.auth-note a { color: var(--accent-gold); font-weight: 600; text-decoration: underline; }

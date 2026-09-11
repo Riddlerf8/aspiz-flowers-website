@@ -10,6 +10,7 @@
     {% elif active_filter == "new" %}Yeni Ürünler
     {% elif active_filter == "deal" %}Fırsat Ürünleri
     {% elif active_filter == "popular" %}Popüler Ürünler
+    {% elif badge_filter_label %}{{ badge_filter_label }}
     {% else %}Tüm Ürünler{% endif %}
   </h1>
 
@@ -24,7 +25,7 @@
   {% if page_obj.has_next %}
     <div class="flex justify-center mt-8">
       <button type="button" data-load-more-btn
-              data-next-url="?page={{ page_obj.next_page_number }}{% if active_category %}&category={{ active_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&filter={{ active_filter }}{% endif %}"
+              data-next-url="?page={{ page_obj.next_page_number }}{% if active_category %}&category={{ active_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&filter={{ active_filter }}{% endif %}{% if badge_filter %}&badge={{ badge_filter }}{% endif %}"
               class="text-sm font-medium text-wine-700 dark:text-[#f5f3ef] border border-cream-200 dark:border-white/10 rounded-pill px-8 py-2.5 hover:bg-cream-100 dark:hover:bg-white/5 transition">
         Daha Fazla Göster
       </button>

@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from .models import Category, PriceTier, Product, ProductImage
@@ -34,12 +35,42 @@ class ProductImageInline(admin.TabularInline):
     fields = ("image", "is_primary", "order")
 
 
+class ContactPriceField(forms.DecimalField):
+    """Same as a normal price field, but also accepts the literal word
+    "DM" (any case) as input, which is stored as NULL — i.e. this tier
+    will show a WhatsApp "Mesaj" button instead of a fixed price.
+    An existing NULL price is shown back to the admin user as "DM" too."""
+
+    widget = forms.TextInput(attrs={"style": "width: 6em;"})
+
+    def to_python(self, value):
+        if isinstance(value, str) and value.strip().upper() == "DM":
+            return None
+        return super().to_python(value)
+
+    def prepare_value(self, value):
+        return "DM" if value in (None, "") else value
+
+
+class PriceTierAdminForm(forms.ModelForm):
+    price = ContactPriceField(
+        required=False,
+        help_text="Sayı girin, ya da sadece \"DM\" yazın (fiyat yerine WhatsApp'tan mesaj butonu gösterilir).",
+    )
+
+    class Meta:
+        model = PriceTier
+        fields = "__all__"
+
+
 class PriceTierInline(admin.TabularInline):
     model = PriceTier
+    form = PriceTierAdminForm
     extra = 1
     fields = ("min_quantity", "price")
-    # Leave "price" blank on the highest-quantity row to show that tier as
-    # "DM" (contact for price) instead of a fixed amount — see PriceTier.clean.
+    # Type "DM" in the price field on the highest-quantity row to show that
+    # tier as "DM" (contact for price) instead of a fixed amount — see
+    # PriceTier.clean, which still enforces this only on the top tier.
 
 
 @admin.register(Product)

@@ -48,7 +48,7 @@ instead of using hardcoded neutral/black colors.
     </button>
 
     {% if product.is_sold_out %}
-      <div class="absolute inset-0 flex items-center justify-center bg-black/45">
+      <div class="absolute inset-0 flex items-center justify-center bg-wine-900/45">
         <span class="rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide shadow-sm" style="background-color: var(--bg-card); color: var(--text-main);">
           Tükendi
         </span>
@@ -81,7 +81,7 @@ instead of using hardcoded neutral/black colors.
               {{ pr.min }} ₺ - {{ pr.max }} ₺
             </span>
           {% elif product.has_contact_tier %}
-            <span class="text-[14.5px] font-bold text-emerald-600">DM</span>
+            <span class="text-[14.5px] font-bold text-emerald-600">Mesaj</span>
           {% else %}
             <span class="text-[14.5px] font-bold" style="color: var(--text-main);">-</span>
           {% endif %}
@@ -92,7 +92,7 @@ instead of using hardcoded neutral/black colors.
           {% endif %}
           {% if product.has_contact_tier and pr %}
             <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50">
-              <i class="fa-brands fa-whatsapp"></i> {{ product.contact_tier.min_quantity }}+ DM
+              <i class="fa-brands fa-whatsapp"></i> {{ product.contact_tier.min_quantity }}+ Mesaj
             </span>
           {% endif %}
         {% endwith %}

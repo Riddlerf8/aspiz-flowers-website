@@ -11,5 +11,8 @@
     {% if popular_products %}
       {% include "components/product_section.html" with title="Popüler Ürünler" products=popular_products bg="bg-pink-50" see_all_url=popular_url %}
     {% endif %}
+    {% for section in badge_sections %}
+      {% include "components/product_section.html" with title=section.title products=section.products see_all_url=section.see_all_url %}
+    {% endfor %}
   </div>
 {% endblock %}
