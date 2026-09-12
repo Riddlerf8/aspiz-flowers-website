@@ -5,11 +5,9 @@ Flat "catalogue card" style, fully themed via the site's own CSS variables
 from static/vendor/css/site.css) so it automatically matches light/dark mode
 instead of using hardcoded neutral/black colors.
 {% endcomment %}
-<div class="group flex h-full flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1"
-     style="background-color: var(--bg-card); border-color: var(--border-color); box-shadow: var(--shadow-sm);"
-     onmouseover="this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+<div class="product-card group flex h-full flex-col">
 
-  <div class="relative aspect-[4/5] overflow-hidden" style="background-color: var(--bg-main);">
+  <div class="product-media relative aspect-[4/5] overflow-hidden">
     <a href="{{ product.get_absolute_url }}" class="absolute inset-0 block">
       {% if product.primary_image %}
         <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"
@@ -56,10 +54,9 @@ instead of using hardcoded neutral/black colors.
     {% endif %}
   </div>
 
-  <div class="flex flex-1 flex-col p-3.5 md:p-4">
+  <div class="product-info flex flex-1 flex-col">
     <a href="{{ product.get_absolute_url }}"
-       class="mb-1 block text-[12.5px] font-bold uppercase leading-snug tracking-wide line-clamp-2 transition-colors"
-       style="color: var(--text-main);">
+       class="product-name mb-1 block">
       {{ product.name }}
     </a>
 
@@ -69,7 +66,7 @@ instead of using hardcoded neutral/black colors.
       </p>
     {% endif %}
 
-    <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-1">
+    <div class="product-price-row mt-auto">
       {% if product.is_sold_out %}
         <span class="inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold" style="background-color: var(--bg-main); color: var(--text-muted);">
           Tükendi
@@ -77,8 +74,9 @@ instead of using hardcoded neutral/black colors.
       {% else %}
         {% with pr=product.price_range opr=product.original_price_range %}
           {% if pr %}
-            <span class="text-[14.5px] font-bold" style="color: var(--text-main);">
-              {{ pr.min }} ₺ - {{ pr.max }} ₺
+            <span class="price-display">
+              <span class="price-value">{{ pr.min }} - {{ pr.max }}</span>
+              <span class="price-unit">₺</span>
             </span>
           {% elif product.has_contact_tier %}
             <span class="text-[14.5px] font-bold text-emerald-600">Mesaj</span>
@@ -86,8 +84,9 @@ instead of using hardcoded neutral/black colors.
             <span class="text-[14.5px] font-bold" style="color: var(--text-main);">-</span>
           {% endif %}
           {% if opr %}
-            <span class="text-[12px] line-through" style="color: var(--text-muted); opacity:.75;">
-              {{ opr.min }} ₺ - {{ opr.max }} ₺
+            <span class="price-display price-display-muted" style="font-size: 12px; opacity: .75;">
+              <span class="price-value">{{ opr.min }} - {{ opr.max }}</span>
+              <span class="price-unit">₺</span>
             </span>
           {% endif %}
           {% if product.has_contact_tier and pr %}

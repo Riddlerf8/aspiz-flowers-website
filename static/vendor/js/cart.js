@@ -31,8 +31,10 @@
     return match ? decodeURIComponent(match[2]) : null;
   }
 
-  const formatPrice = (value) =>
-    `${Number(value).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺`;
+  const formatPriceValue = (value) =>
+    Number(value).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const formatPrice = (value) => `${formatPriceValue(value)} ₺`;
 
   const escapeHtml = (str) =>
     String(str).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -44,7 +46,10 @@
       </div>
       <div class="cart-item-info">
         <span class="cart-item-name">${escapeHtml(item.name)}</span>
-        <span class="cart-item-price">${formatPrice(item.unit_price)}</span>
+        <span class="cart-item-price price-display">
+          <span class="price-value">${formatPriceValue(item.unit_price)}</span>
+          <span class="price-unit">₺</span>
+        </span>
       </div>
       <div class="cart-item-qty">
         <button type="button" class="cart-qty-btn" data-cart-decrease="${item.product_id}" aria-label="Azalt">−</button>
@@ -78,7 +83,9 @@
     itemsList.hidden = false;
     footer.hidden = false;
     itemsList.innerHTML = data.items.map(buildItemRow).join("");
-    if (totalEl) totalEl.textContent = formatPrice(data.cart_total_price);
+    if (totalEl) {
+      totalEl.innerHTML = `<span class="price-display price-display-total"><span class="price-value">${formatPriceValue(data.cart_total_price)}</span><span class="price-unit">₺</span></span>`;
+    }
   };
 
   const postCart = async (url, quantity) => {

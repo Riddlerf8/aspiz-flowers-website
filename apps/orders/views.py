@@ -16,13 +16,18 @@ def checkout(request):
     order_id = request.GET.get("order")
     if order_id:
         order = get_object_or_404(Order, pk=order_id, user=request.user)
+        whatsapp_link = get_customer_whatsapp_link(order)
+
+        if whatsapp_link:
+            return redirect(whatsapp_link)
+
         return render(
             request,
             "orders/checkout.html",
             {
                 "order": order,
-                "whatsapp_link": get_customer_whatsapp_link(order),
-                "auto_open_whatsapp": request.GET.get("whatsapp") == "1",
+                "whatsapp_link": None,
+                "auto_open_whatsapp": False,
             },
         )
 
@@ -57,11 +62,12 @@ def checkout(request):
         send_order_notification(order)
 
         messages.success(request, f"Siparişiniz alındı! Sipariş No: #{order.pk}")
-        # ?whatsapp=1 tells the order detail page to auto-open the
-        # customer's own WhatsApp with the full cart pre-filled — this is
-        # the "direct payment" path and works even if the Business API
-        # alert above isn't configured/approved yet.
-        return redirect(f"{reverse('orders:checkout')}?order={order.pk}&whatsapp=1")
+
+        whatsapp_link = get_customer_whatsapp_link(order)
+        if whatsapp_link:
+            return redirect(whatsapp_link)
+
+        return redirect(f"{reverse('orders:checkout')}?order={order.pk}")
 
     return render(request, "orders/checkout.html", {"cart": cart})
 
@@ -74,7 +80,12 @@ def order_history(request):
 
 @login_required
 def order_detail(request, pk):
-    get_object_or_404(Order, pk=pk, user=request.user)
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+    whatsapp_link = get_customer_whatsapp_link(order)
+
+    if whatsapp_link:
+        return redirect(whatsapp_link)
+
     return redirect(f"{reverse('orders:checkout')}?order={pk}")
 
 

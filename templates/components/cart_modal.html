@@ -29,7 +29,12 @@
       <div class="cart-modal-footer" data-cart-footer hidden>
         <div class="cart-total-row">
           <span>Ara Toplam</span>
-          <strong data-cart-total>0 ₺</strong>
+          <strong data-cart-total>
+            <span class="price-display price-display-total">
+              <span class="price-value">0</span>
+              <span class="price-unit">₺</span>
+            </span>
+          </strong>
         </div>
         <a href="{% url 'orders:checkout' %}" class="cart-checkout-btn" data-cart-checkout>
           Ödemeye Geç <i class="fa-solid fa-arrow-right"></i>

@@ -24,7 +24,13 @@
             <div class="cart-item-info">
               <a href="{{ item.product.get_absolute_url }}" class="cart-item-name">{{ item.product.name }}</a>
  
-              <p class="cart-item-unit">{{ item.unit_price|intcomma }} ₺ / adet</p>
+              <p class="cart-item-unit">
+                <span class="price-display">
+                  <span class="price-value">{{ item.unit_price|intcomma }}</span>
+                  <span class="price-unit">₺</span>
+                </span>
+                / adet
+              </p>
 
             </div>
             <form action="{% url 'cart:update' item.product_id %}" method="post" class="cart-qty-form">
@@ -34,7 +40,12 @@
               <button type="submit" class="cart-qty-update">Güncelle</button>
             </form>
 
-            <strong class="cart-line-total">{{ item.line_total|intcomma }} ₺</strong>
+            <strong class="cart-line-total">
+              <span class="price-display">
+                <span class="price-value">{{ item.line_total|intcomma }}</span>
+                <span class="price-unit">₺</span>
+              </span>
+            </strong>
 
             <form action="{% url 'cart:remove' item.product_id %}" method="post">
               {% csrf_token %}
@@ -45,7 +56,12 @@
         <div class="cart-total-row">
           <span>Toplam</span>
 
-          <strong>{{ cart.total_price|intcomma }} ₺</strong>
+          <strong>
+            <span class="price-display price-display-total">
+              <span class="price-value">{{ cart.total_price|intcomma }}</span>
+              <span class="price-unit">₺</span>
+            </span>
+          </strong>
 
         </div>
       </div>

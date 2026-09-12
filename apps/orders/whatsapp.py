@@ -103,6 +103,8 @@ def send_order_notification(order):
         return False
 
     order_link = f"{settings.SITE_BASE_URL}/admin/orders/order/{order.pk}/change/"
+    site_url = settings.SITE_BASE_URL.rstrip("/")
+    details_text = f"{order_link}\n{site_url}"
     customer_name = order.user.get_full_name() or order.user.username
 
     url = (
@@ -123,7 +125,7 @@ def send_order_notification(order):
                         {"type": "text", "text": str(order.pk)},
                         {"type": "text", "text": customer_name},
                         {"type": "text", "text": str(order.total)},
-                        {"type": "text", "text": order_link},
+                        {"type": "text", "text": details_text},
                     ],
                 }
             ],
