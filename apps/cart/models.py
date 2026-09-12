@@ -31,7 +31,10 @@ class Cart(models.Model):
 
     @property
     def total_items(self):
-        return sum(item.quantity for item in self.items.all())
+        # Count of distinct line items (products) in the cart, not the
+        # sum of quantities — e.g. 3 different flowers x5 each shows "3",
+        # not "15".
+        return self.items.count()
 
     @property
     def total_price(self):

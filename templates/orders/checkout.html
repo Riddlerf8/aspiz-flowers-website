@@ -3,24 +3,26 @@
 
 {% block extra_head %}
 <style>
-  .order-page { max-width: 920px; margin: 0 auto; padding: 2.5rem 0 4rem; }
-  .order-kicker { color: var(--accent-gold); font-size: .7rem; letter-spacing: .28em; text-transform: uppercase; }
-  .order-title { margin: .35rem 0 1.5rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.65rem, 3vw, 2.4rem); font-weight: 600; line-height: 1; }
-  .order-rule { width: 64px; height: 2px; margin-bottom: 2rem; background: var(--accent-gold); }
+
+  .order-page { max-width: 920px; margin: 0 auto; padding: 2rem 0 3rem; }
+  .order-kicker { color: var(--accent-gold); font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; }
+  .order-title { margin: .3rem 0 1.25rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 600; line-height: 1; }
+  .order-rule { width: 58px; height: 2px; margin-bottom: 1.5rem; background: var(--accent-gold); }
   .order-panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); }
-  .order-line { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.15rem 1.35rem; border-bottom: 1px solid var(--border-color); }
-  .order-line-name { color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; }
-  .order-line-price { color: var(--accent-plum); font-weight: 700; white-space: nowrap; }
-  .order-total { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 1.5rem 1.35rem; background: var(--bg-main); }
-  .order-total strong { color: var(--accent-plum); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; }
-  .order-address { margin: 1rem 0 1.5rem; padding: 1.15rem 1.35rem; border-left: 3px solid var(--accent-gold); background: color-mix(in srgb, var(--bg-card) 70%, transparent); color: var(--text-muted); }
-  .order-address strong { display: block; margin-bottom: .25rem; color: var(--text-main); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
-  .order-action { display: flex; align-items: center; justify-content: center; gap: .55rem; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-weight: 700; letter-spacing: .06em; transition: var(--transition); }
+  .order-line { display: flex; align-items: center; justify-content: space-between; gap: .85rem; padding: .95rem 1.15rem; border-bottom: 1px solid var(--border-color); }
+  .order-line-name { color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; }
+  .order-line-price { color: var(--accent-plum); font-weight: 700; white-space: nowrap; font-size: .95rem; }
+  .order-total { display: flex; align-items: baseline; justify-content: space-between; gap: .85rem; padding: 1.25rem 1.15rem; background: var(--bg-main); }
+  .order-total strong { color: var(--accent-plum); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.7rem; }
+  .order-address { margin: .85rem 0 1.25rem; padding: 1rem 1.15rem; border-left: 3px solid var(--accent-gold); background: color-mix(in srgb, var(--bg-card) 70%, transparent); color: var(--text-muted); }
+  .order-address strong { display: block; margin-bottom: .2rem; color: var(--text-main); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
+  .order-action { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .9rem 1rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-size: .9rem; font-weight: 700; letter-spacing: .04em; transition: var(--transition); }
   .order-action:hover { background: var(--bg-nav); transform: translateY(-2px); }
-  .order-note { margin: .85rem auto 0; max-width: 680px; color: var(--text-muted); font-size: .75rem; text-align: center; }
-  .order-status { display: inline-flex; align-items: center; gap: .5rem; color: var(--accent-gold); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; }
-  .order-cancel { display: inline-block; margin-top: 1.75rem; color: #b4233e; font-size: .8rem; text-decoration: underline; }
-  @media (max-width: 640px) { .order-page { padding-top: 1rem; } .order-line { align-items: flex-start; } .order-total { align-items: flex-end; } }
+  .order-note { margin: .7rem auto 0; max-width: 680px; color: var(--text-muted); font-size: .7rem; text-align: center; }
+  .order-status { display: inline-flex; align-items: center; gap: .45rem; color: var(--accent-gold); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+  .order-cancel { display: inline-block; margin-top: 1.5rem; color: #b4233e; font-size: .75rem; text-decoration: underline; }
+  @media (max-width: 640px) { .order-page { padding-top: .85rem; } .order-line { align-items: flex-start; } .order-total { align-items: flex-end; } }
+
 </style>
 {% endblock %}
 

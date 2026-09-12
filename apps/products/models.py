@@ -215,7 +215,7 @@ class ProductImage(models.Model):
         200-300 products that's 1-3GB of storage and, worse, every one of
         those full-size files gets served straight to visitors' phones on
         the product grid. This downsizes to MAX_DIMENSION on the longest
-        side and re-encodes as JPEG at quality 82, which in practice takes
+        side and re-encodes as WEBP at quality 82, which in practice takes
         a ~6MB photo down to ~200-400KB with no visible quality loss on
         screen. Runs once, at upload time, so it costs nothing later.
         """
@@ -227,11 +227,11 @@ class ProductImage(models.Model):
         img.thumbnail((MAX_DIMENSION, MAX_DIMENSION), Image.LANCZOS)
 
         buffer = io.BytesIO()
-        img.save(buffer, format="JPEG", quality=82, optimize=True)
+        img.save(buffer, format="WEBP", quality=82, method=6)
         buffer.seek(0)
 
         original_name = self.image.name.rsplit(".", 1)[0]
-        self.image = ContentFile(buffer.read(), name=f"{original_name}.jpg")
+        self.image = ContentFile(buffer.read(), name=f"{original_name}.webp")
 
     def save(self, *args, **kwargs):
         if self.image and self._state.adding:

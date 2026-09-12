@@ -13,6 +13,7 @@
   .accordion-panel { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
   .accordion-icon { transition: transform .2s ease; }
   .luxe-cta {
+    color: #f6ecd4;
     background-image: linear-gradient(110deg, #3c0c1c 0%, #7d2140 45%, #4a0f24 100%);
     background-size: 200% auto;
     background-position: left center;
@@ -123,7 +124,8 @@
                class="w-24 rounded-lg border border-cream-200 dark:border-white/10 px-3 py-2 text-sm
                       focus:outline-none focus:ring-1 focus:ring-[#c9a768] focus:border-[#c9a768]">
         <button type="submit" {% if product.is_sold_out %}disabled{% endif %}
-                class="flex-1 rounded-pill py-3.5 font-semibold text-[12.5px] tracking-[0.14em] uppercase transition-all duration-300 flex items-center justify-center gap-2
+                  class="flex-1 min-h-[52px] rounded-xl px-4 py-3.5 font-bold text-sm sm:text-base tracking-normal uppercase transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#6d1a35]/20
+                    text-[#f6ecd4]
                        {% if product.is_sold_out %}bg-wine-100 dark:bg-white/10 text-wine-300 dark:text-[#8a7355] cursor-not-allowed{% else %}luxe-cta text-[#f6ecd4]{% endif %}">
           <i class="fa-solid fa-cart-shopping"></i>
           {% if product.is_sold_out %}Tükendi{% else %}SİPARİŞ LİSTESİNE EKLE{% endif %}
@@ -132,7 +134,7 @@
 
       <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}?text={{ product.name|urlencode }}{{ ' hakkında bilgi almak istiyorum.'|urlencode }}"
          target="_blank" rel="noopener noreferrer"
-         class="inline-flex items-center gap-2 text-sm text-wine-600 dark:text-[#d8cdbd] hover:text-wine-800 mb-2">
+         class="inline-flex items-center gap-2 text-base font-medium text-wine-600 dark:text-[#d8cdbd] hover:text-wine-800 mb-2">
         <i class="fa-brands fa-whatsapp text-emerald-600"></i> WHATSAPP’TAN BİLGİ AL
       </a>
 

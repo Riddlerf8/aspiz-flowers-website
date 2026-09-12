@@ -3228,39 +3228,39 @@ html.dark-mode input:-moz-ui-autofill {
    product list, cart, order history and auth pages match it instead of
    each inventing its own heading style.
    ========================================================================== */
-.page-kicker { color: var(--accent-gold); font-size: .7rem; letter-spacing: .28em; text-transform: uppercase; }
-.page-title { margin: .35rem 0 1.5rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 600; line-height: 1; }
-.page-rule { width: 64px; height: 2px; margin-bottom: 2rem; background: var(--accent-gold); }
+.page-kicker { color: var(--accent-gold); font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; }
+.page-title { margin: .3rem 0 1.25rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 600; line-height: 1; }
+.page-rule { width: 58px; height: 2px; margin-bottom: 1.5rem; background: var(--accent-gold); }
 .page-header-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .page-header-row .page-title { margin-bottom: 0; }
-.page-header-link { font-size: .78rem; color: var(--accent-gold); text-decoration: underline; white-space: nowrap; }
+.page-header-link { font-size: .72rem; color: var(--accent-gold); text-decoration: underline; white-space: nowrap; }
 
 /* Shared list panel (cart items / order history rows) - mirrors checkout's order-panel */
-.panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
-.panel-row { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.35rem; border-bottom: 1px solid var(--border-color); }
+.panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); margin-bottom: 1.25rem; }
+.panel-row { display: flex; align-items: center; gap: .85rem; padding: .95rem 1.15rem; border-bottom: 1px solid var(--border-color); }
 .panel-row:last-child { border-bottom: none; }
 .panel-row:hover { background: color-mix(in srgb, var(--bg-card) 85%, var(--accent-gold) 15%); }
-.panel-empty { padding: 3rem 1.5rem; text-align: center; color: var(--text-muted); }
-.panel-empty i { font-size: 1.75rem; color: var(--accent-gold); margin-bottom: .75rem; display: block; }
+.panel-empty { padding: 2.5rem 1.25rem; text-align: center; color: var(--text-muted); }
+.panel-empty i { font-size: 1.5rem; color: var(--accent-gold); margin-bottom: .65rem; display: block; }
 
 /* Reusable solid CTA button - mirrors checkout page's WhatsApp payment button */
-.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: .8rem; transition: var(--transition); }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .9rem 1rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .76rem; transition: var(--transition); }
 .btn-primary:hover { background: var(--bg-nav); transform: translateY(-2px); }
 
 /* Cart page */
 .cart-thumb { width: 72px; height: 72px; flex-shrink: 0; overflow: hidden; background: var(--bg-main); border: 1px solid var(--border-color); }
 .cart-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .cart-item-info { flex: 1; min-width: 10rem; }
-.cart-item-name { display: block; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.2rem; }
-.cart-item-unit { font-size: .78rem; color: var(--text-muted); }
-.cart-qty-form { display: flex; align-items: center; gap: .6rem; }
-.cart-qty-input { width: 4.2rem; padding: .4rem .5rem; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); text-align: center; }
-.cart-qty-update { font-size: .75rem; color: var(--accent-gold); text-decoration: underline; background: none; border: none; cursor: pointer; }
-.cart-line-total { min-width: 5rem; text-align: right; color: var(--accent-plum); font-weight: 700; }
-.cart-remove-btn { color: #b4233e; background: none; border: none; cursor: pointer; font-size: 1rem; }
-.cart-total-row { display: flex; align-items: baseline; justify-content: space-between; padding: 1.5rem 1.35rem; background: var(--bg-main); }
-.cart-total-row strong { color: var(--accent-plum); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.7rem; }
-.cart-empty-icon { font-size: 2rem; color: var(--accent-gold); margin-bottom: .75rem; display: block; }
+.cart-item-name { display: block; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.08rem; }
+.cart-item-unit { font-size: .85rem; color: var(--text-muted); }
+.cart-qty-form { display: flex; align-items: center; gap: .5rem; }
+.cart-qty-input { width: 4rem; padding: .35rem .45rem; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); text-align: center; }
+.cart-qty-update { font-size: .7rem; color: var(--accent-gold); text-decoration: underline; background: none; border: none; cursor: pointer; }
+.cart-line-total { min-width: 5rem; text-align: right; color: var(--accent-plum); font-size: .95rem; font-weight: 700; }
+.cart-remove-btn { color: #b4233e; background: none; border: none; cursor: pointer; font-size: .95rem; }
+.cart-total-row { display: flex; align-items: baseline; justify-content: space-between; padding: 1.25rem 1.15rem; background: var(--bg-main); font-size: .95rem; }
+.cart-total-row strong { color: var(--accent-plum); font-family: 'Inter', system-ui, sans-serif; font-size: 1.6rem; font-weight: 700; }
+.cart-empty-icon { font-size: 1.75rem; color: var(--accent-gold); margin-bottom: .7rem; display: block; }
 
 /* Order history rows */
 .history-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }

@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import os
 import sys
@@ -260,4 +261,5 @@ GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
 GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
 # Must exactly match an "Authorized redirect URI" configured for this
 # OAuth client in Google Cloud Console -> APIs & Services -> Credentials.
+
 GOOGLE_OAUTH_REDIRECT_URI = f"{SITE_BASE_URL}/accounts/google/callback/"
