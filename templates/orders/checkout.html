@@ -5,18 +5,16 @@
 <style>
 
   .order-page { max-width: 920px; margin: 0 auto; padding: 2rem 0 3rem; }
-  .order-kicker { color: var(--accent-gold); font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; }
-  .order-title { margin: .3rem 0 1.25rem; color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 600; line-height: 1; }
-  .order-rule { width: 58px; height: 2px; margin-bottom: 1.5rem; background: var(--accent-gold); }
-  .order-panel { overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm); }
-  .order-line { display: flex; align-items: center; justify-content: space-between; gap: .85rem; padding: .95rem 1.15rem; border-bottom: 1px solid var(--border-color); }
+  .order-panel { overflow: hidden; border-radius: 1rem; margin-bottom: 1.25rem; }
+  .order-line { display: flex; align-items: center; justify-content: space-between; gap: .85rem; padding: .95rem 1.15rem; border-bottom: 1px solid rgba(176, 146, 113, 0.18); }
+  .order-line:last-child { border-bottom: none; }
   .order-line-name { color: var(--text-main); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; }
   .order-line-price { color: var(--accent-plum); font-weight: 700; white-space: nowrap; font-size: .95rem; }
-  .order-total { display: flex; align-items: baseline; justify-content: space-between; gap: .85rem; padding: 1.25rem 1.15rem; background: var(--bg-main); }
+  .order-total { display: flex; align-items: baseline; justify-content: space-between; gap: .85rem; padding: 1.25rem 1.15rem; background: rgba(255,255,255,0.03); }
   .order-total strong { color: var(--accent-plum); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.7rem; }
-  .order-address { margin: .85rem 0 1.25rem; padding: 1rem 1.15rem; border-left: 3px solid var(--accent-gold); background: color-mix(in srgb, var(--bg-card) 70%, transparent); color: var(--text-muted); }
+  .order-address { margin: .85rem 0 1.25rem; padding: 1rem 1.15rem; border-left: 3px solid var(--accent-gold); background: rgba(255,255,255,0.04); color: var(--text-muted); border-radius: 0.85rem; }
   .order-address strong { display: block; margin-bottom: .2rem; color: var(--text-main); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
-  .order-action { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .9rem 1rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-size: .9rem; font-weight: 700; letter-spacing: .04em; transition: var(--transition); }
+  .order-action { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .9rem 1rem; border: 1px solid var(--accent-gold); background: var(--accent-plum); color: #fff; font-size: .9rem; font-weight: 700; letter-spacing: .04em; transition: var(--transition); border-radius: 0.9rem; }
   .order-action:hover { background: var(--bg-nav); transform: translateY(-2px); }
   .order-note { margin: .7rem auto 0; max-width: 680px; color: var(--text-muted); font-size: .7rem; text-align: center; }
   .order-status { display: inline-flex; align-items: center; gap: .45rem; color: var(--accent-gold); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
@@ -29,18 +27,28 @@
 {% block content %}
   <section class="order-page">
     {% if order %}
-      <span class="order-kicker">Aspiz Flowers · Siparişiniz</span>
-      <h1 class="order-title">Sipariş #{{ order.pk }}</h1>
-      <div class="order-rule"></div>
+      <span class="page-kicker">Aspiz Flowers · Siparişiniz</span>
+      <h1 class="page-title">Sipariş #{{ order.pk }}</h1>
+      <div class="page-rule"></div>
       <div class="order-status"><i class="fa-regular fa-clock"></i> {{ order.get_status_display }}</div>
-      <div class="order-panel" style="margin-top: 1.25rem;">
+      <div class="panel order-panel" style="margin-top: 1.25rem;">
         {% for item in order.items.all %}
-          <div class="order-line">
+          <div class="panel-row order-line">
             <span class="order-line-name">{{ item.quantity }} × {{ item.product.name }}</span>
-            <span class="order-line-price">{{ item.line_total }} ₺</span>
+            <span class="order-line-price">
+              <span class="price-display">
+                <span class="price-value">{{ item.line_total }}</span>
+                <span class="price-unit">₺</span>
+              </span>
+            </span>
           </div>
         {% endfor %}
-        <div class="order-total"><span>Toplam</span><strong>{{ order.total }} ₺</strong></div>
+        <div class="cart-total-row order-total"><span>Toplam</span><strong>
+          <span class="price-display price-display-total">
+            <span class="price-value">{{ order.total }}</span>
+            <span class="price-unit">₺</span>
+          </span>
+        </strong></div>
       </div>
 
       {% if whatsapp_link %}
@@ -59,17 +67,27 @@
         {% endif %}
       {% endif %}
     {% else %}
-      <span class="order-kicker">Aspiz Flowers · Son Adım</span>
-      <h1 class="order-title">Siparişi Tamamla</h1>
-      <div class="order-rule"></div>
-      <div class="order-panel">
+      <span class="page-kicker">Aspiz Flowers · Son Adım</span>
+      <h1 class="page-title">Siparişi Tamamla</h1>
+      <div class="page-rule"></div>
+      <div class="panel order-panel">
         {% for item in cart.items.all %}
-          <div class="order-line">
+          <div class="panel-row order-line">
             <span class="order-line-name">{{ item.quantity }} × {{ item.product.name }}</span>
-            <span class="order-line-price">{{ item.line_total }} ₺</span>
+            <span class="order-line-price">
+              <span class="price-display">
+                <span class="price-value">{{ item.line_total }}</span>
+                <span class="price-unit">₺</span>
+              </span>
+            </span>
           </div>
         {% endfor %}
-        <div class="order-total"><span>Toplam</span><strong>{{ cart.total_price }} ₺</strong></div>
+        <div class="cart-total-row order-total"><span>Toplam</span><strong>
+          <span class="price-display price-display-total">
+            <span class="price-value">{{ cart.total_price }}</span>
+            <span class="price-unit">₺</span>
+          </span>
+        </strong></div>
       </div>
       <div class="order-address"><strong>Teslimat Adresi</strong>{{ user.address|default:"Profilinizde adres kaydınız yok." }}</div>
       <form action="{% url 'orders:checkout' %}" method="post">

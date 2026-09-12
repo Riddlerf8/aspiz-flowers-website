@@ -5,20 +5,71 @@
 {% block extra_head %}
 <style>
   .thumb-active { border-color: #7d2140; box-shadow: 0 0 0 1px #7d2140; }
+
+  .tier-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 104px;
+    padding: 0.9rem 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(176, 146, 113, 0.35);
+    background: rgba(248, 239, 235, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+  }
+
+  .tier-box:hover {
+    border-color: var(--accent-gold, #b8925a);
+    transform: translateY(-1px);
+  }
+
   .tier-box.tier-active {
     border-color: var(--accent-gold, #b8925a);
-    background-color: var(--bg-card, #f3e9ec);
+    background: rgba(176, 146, 113, 0.12);
+    box-shadow: 0 10px 24px -16px rgba(109, 26, 53, 0.45);
   }
-  .tier-box.tier-active .tier-price { color: var(--accent-plum, #6d1a35); }
+
+  .tier-box .tier-label {
+    display: block;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted, #7c6d63);
+  }
+
+  .tier-box .tier-price {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--accent-plum, #6d1a35);
+  }
+
+  .tier-box[data-tier-contact] {
+    border-style: dashed;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .tier-box[data-tier-contact] .tier-price {
+    color: #1ea66b;
+  }
+
   .accordion-panel { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
   .accordion-icon { transition: transform .2s ease; }
   .luxe-cta {
+    min-height: 56px;
+    padding: 0.95rem 1.1rem;
+    border-radius: 0.9rem;
     color: #f6ecd4;
     background-image: linear-gradient(110deg, #3c0c1c 0%, #7d2140 45%, #4a0f24 100%);
     background-size: 200% auto;
     background-position: left center;
     border: 1px solid rgba(201, 167, 104, 0.55);
-    box-shadow: 0 8px 22px -8px rgba(74, 15, 36, 0.55);
+    box-shadow: 0 10px 24px -10px rgba(74, 15, 36, 0.6);
     transition: background-position .5s ease, box-shadow .3s ease, transform .3s ease, border-color .3s ease;
   }
   .luxe-cta:hover:not(:disabled) {
@@ -84,17 +135,20 @@
             {% if tier.is_contact_price %}
               <a href="https://wa.me/{{ shop_whatsapp_display|cut:' '|cut:'+' }}?text={{ product.name|urlencode }}{{ ' - '|urlencode }}{{ tier.min_quantity|stringformat:'s'|add:'+ adet için fiyat almak istiyorum.'|urlencode }}"
                  target="_blank" rel="noopener noreferrer" data-tier-contact
-                 class="tier-box text-left border border-dashed border-wine-200 dark:border-[#c9a768]/40 rounded-xl px-3 py-2.5 transition hover:border-wine-400">
-                <span class="block tier-price text-base font-semibold text-emerald-600">
-                  <i class="fa-brands fa-whatsapp"></i> Mesaj
-                </span>
-                <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">Minimum Alım: {{ tier.min_quantity }} Adet</span>
+                 class="tier-box text-left">
+                <span class="tier-label">Min. {{ tier.min_quantity }} adet</span>
+                <span class="tier-price"><i class="fa-brands fa-whatsapp"></i> Mesaj</span>
               </a>
             {% else %}
               <button type="button" data-tier-select data-tier-min-qty="{{ tier.min_quantity }}"
-                      class="tier-box {% if tier.pk == product.highest_priced_tier.pk %}tier-active{% endif %} text-left border border-cream-200 dark:border-white/10 rounded-xl px-3 py-2.5 transition">
-                <span class="block tier-price text-base font-semibold text-wine-900 dark:text-[#f5f3ef]">{{ tier.price }} ₺</span>
-                <span class="block text-[11px] text-wine-400 dark:text-[#a39c8f] mt-0.5">Minimum Alım: {{ tier.min_quantity }} Adet</span>
+                      class="tier-box {% if tier.pk == product.highest_priced_tier.pk %}tier-active{% endif %} text-left">
+                <span class="tier-label">Min. {{ tier.min_quantity }} adet</span>
+                <span class="tier-price">
+                  <span class="price-display">
+                    <span class="price-value">{{ tier.price }}</span>
+                    <span class="price-unit">₺</span>
+                  </span>
+                </span>
               </button>
             {% endif %}
           {% endfor %}
