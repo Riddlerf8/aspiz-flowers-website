@@ -2999,6 +2999,7 @@ html[dir="rtl"] .footer-links a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0.8rem 0.9rem;
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.06);
@@ -3012,6 +3013,7 @@ html[dir="rtl"] .footer-links a:hover {
   transform: none;
   border-color: rgba(176, 146, 113, 0.38);
   background: rgba(255, 255, 255, 0.09);
+
 }
 
 .order-id {

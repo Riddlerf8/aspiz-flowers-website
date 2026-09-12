@@ -5,9 +5,11 @@ Flat "catalogue card" style, fully themed via the site's own CSS variables
 from static/vendor/css/site.css) so it automatically matches light/dark mode
 instead of using hardcoded neutral/black colors.
 {% endcomment %}
+
 <div class="product-card group flex h-full flex-col">
 
   <div class="product-media relative aspect-[4/5] overflow-hidden">
+
     <a href="{{ product.get_absolute_url }}" class="absolute inset-0 block">
       {% if product.primary_image %}
         <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}"

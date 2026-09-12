@@ -24,6 +24,7 @@
             <div class="cart-item-info">
               <a href="{{ item.product.get_absolute_url }}" class="cart-item-name">{{ item.product.name }}</a>
  
+
               <p class="cart-item-unit">
                 <span class="price-display">
                   <span class="price-value">{{ item.unit_price|intcomma }}</span>
@@ -31,6 +32,7 @@
                 </span>
                 / adet
               </p>
+
 
             </div>
             <form action="{% url 'cart:update' item.product_id %}" method="post" class="cart-qty-form">
