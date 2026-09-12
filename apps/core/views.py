@@ -35,7 +35,9 @@ def home(request):
         "new_products": active_products.order_by("-created_at")[:12],
         "deal_products": active_products.filter(discount_percent__gt=0)[:12],
         "popular_products": active_products.filter(badge=Product.Badge.POPULAR)[:12],
+
         "badge_sections": badge_sections,
+
         "new_url": f"{reverse('products:list')}?filter=new",
         "deal_url": f"{reverse('products:list')}?filter=deal",
         "popular_url": f"{reverse('products:list')}?filter=popular",

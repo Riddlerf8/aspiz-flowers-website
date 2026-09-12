@@ -271,6 +271,9 @@ class PriceTier(models.Model):
         return self.price is None
 
     def clean(self):
+        if self.product_id is None:
+            return
+
         # Fewer units must never cost less than more units (contact-only
         # tiers have no numeric price, so they're skipped on both sides).
         if self.price is not None:

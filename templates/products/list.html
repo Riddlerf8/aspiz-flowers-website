@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{% if category %}{{ category.name }}{% else %}Tüm Ürünler{% endif %} - Çiçek Deposu{% endblock %}
@@ -35,4 +36,5 @@
 
 {% block extra_js %}
   <script src="{% static 'vendor/js/load-more.js' %}" defer></script>
+
 {% endblock %}

@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
@@ -15,4 +16,5 @@
       {% include "components/product_section.html" with title=section.title products=section.products see_all_url=section.see_all_url %}
     {% endfor %}
   </div>
+
 {% endblock %}

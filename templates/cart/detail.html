@@ -23,7 +23,9 @@
             </div>
             <div class="cart-item-info">
               <a href="{{ item.product.get_absolute_url }}" class="cart-item-name">{{ item.product.name }}</a>
+ 
               <p class="cart-item-unit">{{ item.unit_price|intcomma }} ₺ / adet</p>
+
             </div>
             <form action="{% url 'cart:update' item.product_id %}" method="post" class="cart-qty-form">
               {% csrf_token %}
@@ -31,7 +33,9 @@
               <input id="quantity-{{ item.product_id }}" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" class="cart-qty-input">
               <button type="submit" class="cart-qty-update">Güncelle</button>
             </form>
+
             <strong class="cart-line-total">{{ item.line_total|intcomma }} ₺</strong>
+
             <form action="{% url 'cart:remove' item.product_id %}" method="post">
               {% csrf_token %}
               <button type="submit" class="cart-remove-btn" aria-label="{{ item.product.name }} ürününü kaldır"><i class="fa-solid fa-trash-can"></i></button>
@@ -40,7 +44,9 @@
         {% endfor %}
         <div class="cart-total-row">
           <span>Toplam</span>
+
           <strong>{{ cart.total_price|intcomma }} ₺</strong>
+
         </div>
       </div>
 
